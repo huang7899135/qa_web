@@ -1,0 +1,71 @@
+// {
+//   "extends": "@vue/tsconfig/tsconfig.dom.json",
+//   "compilerOptions": {
+//     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+
+//     /* Linting */
+//     "strict": true,
+//     "noUnusedLocals": true,
+//     "noUnusedParameters": true,
+//     "noFallthroughCasesInSwitch": true,
+//     "noUncheckedSideEffectImports": true
+//   },
+//   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
+// }
+
+
+{
+  // 继承 Vue 官方提供的 DOM 环境基础配置（已包含 Vue 3 必需的类型支持）
+  // 默认配置参考：https://github.com/vuejs/tsconfig
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
+
+  "compilerOptions": {
+    // 编译缓存文件路径（加速增量编译）
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+
+    /* ---------------------- 严格类型检查规则 ---------------------- */
+    "strict": true,                     // 启用所有严格类型检查
+    "noImplicitAny": false,             // 允许隐式 any（开发时可设为 true 提升严谨性）
+    "noUnusedLocals": true,             // 检查未使用的局部变量
+    "noUnusedParameters": true,         // 检查未使用的函数参数
+    "noFallthroughCasesInSwitch": true, // 禁止 switch 语句穿透
+    "noUncheckedSideEffectImports":false,// 关闭对副作用导入的警告（兼容部分库）
+
+    /* ---------------------- 开发体验优化 ---------------------- */
+    "moduleResolution": "bundler",      // 推荐使用 modern bundler 解析模式（需 Vite 4.3+）
+    "allowJs": true,                    // 允许编译 JS 文件（方便迁移旧代码）
+    "resolveJsonModule": true,          // 允许导入 JSON 文件
+    "skipLibCheck": true,               // 跳过库类型检查（提升编译速度）
+    "isolatedModules": true,            // 确保每个文件可独立编译（SSR/ESM 必需）
+
+    /* ---------------------- 路径别名 ---------------------- */
+    "baseUrl": ".",                     // 基准路径
+    "paths": {
+      "@/*": ["src/*"],                 // 常用别名
+      "~/*": ["./node_modules/*"]       // 可选：直接引用 node_modules
+    },
+
+    /* ---------------------- JSX/TSX 支持（可选） ---------------------- */
+    "jsx": "preserve",                  // 保留 JSX 语法（Vue JSX 或 React 兼容）
+    "jsxFactory": "h",                  // Vue 2 JSX 工厂函数
+    "jsxFragmentFactory": "Fragment"    // Vue 3 Fragment 组件
+  },
+
+  // 包含的文件范围（根据项目实际结构调整）
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.vue",
+    "src/**/*.d.ts",        // 类型声明文件
+    "tests/**/*.ts",        // 测试文件（可选）
+    "mock/**/*.ts"          // Mock 数据（可选）
+  ],
+
+  // 排除目录
+  "exclude": [
+    "node_modules",
+    "dist",                 // 构建输出目录
+    "**/*.spec.ts",         // 测试文件（如果单独配置）
+    "public"                // 静态资源目录
+  ]
+}

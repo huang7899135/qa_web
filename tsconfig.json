@@ -1,0 +1,7 @@
+{
+  "files": [],  // 显式为空（由 references 接管）
+  "references": [
+    { "path": "./tsconfig.app.json" },  // 引用子项目配置
+    { "path": "./tsconfig.node.json" }
+  ]
+}

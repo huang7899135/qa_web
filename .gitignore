@@ -1,0 +1,69 @@
+# ========================
+# 日志文件
+# ========================
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ========================
+# 运行时生成文件
+# ========================
+*.local  # 本地环境变量文件（如 .env.local）
+*.env.local  # 显式忽略本地环境变量
+.cache/  # 构建工具缓存（如 Vite、Webpack）
+.temp/   # 临时生成文件
+
+# ========================
+# 依赖目录和构建输出
+# ========================
+node_modules/
+dist/          # 生产构建输出
+dist-ssr/      # SSR 构建输出
+.coverage/     # 测试覆盖率报告
+.nyc_output/   # Istanbul 测试覆盖率临时文件
+
+# ========================
+# IDE 和编辑器配置
+# ========================
+.vscode/*
+!.vscode/extensions.json  # 允许共享推荐的插件配置
+.idea/
+.DS_Store                 # macOS 系统文件
+*.suo                     # Windows 用户选项文件
+*.ntvs*                   # Node Tools for Visual Studio
+*.njsproj                 # Node.js 项目文件
+*.sln                     # Visual Studio 解决方案文件
+*.sw?                     # Vim 交换文件
+
+# ========================
+# 操作系统文件
+# ========================
+Thumbs.db      # Windows 缩略图缓存
+ehthumbs.db    # Windows Explorer 缓存
+Desktop.ini    # Windows 文件夹配置
+
+# ========================
+# 测试相关
+# ========================
+cypress/screenshots/  # Cypress 测试截图
+cypress/videos/       # Cypress 测试录像
+jest-stare/           # Jest 可视化报告
+
+# ========================
+# 现代前端工具特定文件
+# ========================
+.vite/         # Vite 缓存目录
+.eslintcache   # ESLint 缓存
+.prettiercache # Prettier 缓存
+*.tsbuildinfo  # TypeScript 增量编译信息
+
+# ========================
+# 包管理器锁文件（按需保留一个）
+# ========================
+# yarn.lock       # 如果用 Yarn 则取消注释
+# package-lock.json # 如果用 npm 则取消注释
+# pnpm-lock.yaml  # 如果用 pnpm 则取消注释
