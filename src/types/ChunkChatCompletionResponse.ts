@@ -1,16 +1,3 @@
-以下是基于您提供的 cURL 请求和流式响应结构，使用中文重新设计 ChunkChatCompletionResponse 类型，并更新 API 及相关组件的实现方案。我将确保内容清晰，并使用中文进行说明和备注。
-
-重新设计 ChunkChatCompletionResponse
-流式响应包含多种事件类型，每个事件有不同的结构。我们将定义一个 TypeScript 联合类型 ChunkChatCompletionResponse，涵盖所有可能的事件。每个事件将有独立的接口，反映查询中指定的字段。
-
-TypeScript 类型定义
-typescript
-
-Collapse
-
-Unwrap
-
-Copy
 // src/types/ChunkChatCompletionResponse.ts
 
 // 基础接口，包含所有事件共有的字段

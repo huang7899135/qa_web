@@ -89,7 +89,6 @@ const renderMarkdown = (text: string = '') => {
 // --- 接口定义 (添加 isProcessing) ---
 interface RetrieverResource { /* ... */ } // 如需使用，保持定义
 interface MessageFile { id: string; type: string; url: string; belongs_to: 'user' | 'assistant'; }
-// interface MessageFeedback { /* ... */ } // 已移除
 
 interface Message {
   id: string; // 消息唯一 ID
@@ -111,8 +110,6 @@ const props = defineProps<{
   messages: Message[]; // 接收消息数组
 }>();
 
-// --- Emits (移除) ---
-// const emits = defineEmits<{ ... }>(); // 已移除
 
 // --- Refs & Lifecycle (保持不变) ---
 const messagesContainer = ref<HTMLDivElement | null>(null); // 对消息容器元素的引用
@@ -139,9 +136,6 @@ onMounted(() => {
   scrollToBottom('auto'); // 初始加载，瞬间滚动
 });
 
-// --- Methods ---
-
-// 移除 emitFeedback, emitPlayAudio
 
 // 保留: 从 URL 获取文件名
 const getFileNameFromUrl = (url: string): string | null => {

@@ -5,7 +5,7 @@ import { ElInput, ElButton, ElIcon, ElMessage, ElTooltip } from 'element-plus';
 import { Paperclip, Mic, Close, Promotion } from '@element-plus/icons-vue';
 
 const props = defineProps<{
-  disabled: boolean; // 是否禁用输入
+  disabled: boolean; 
 }>();
 
 const emits = defineEmits<{
