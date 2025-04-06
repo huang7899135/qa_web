@@ -8,5 +8,8 @@ export default defineConfig({
     alias: {
       '@': '/src' // 设置 @ 别名指向 src 目录
     }
+  },
+  build: {
+    sourcemap: true
   }
 })

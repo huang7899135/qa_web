@@ -1,357 +1,435 @@
 <!-- src/components/ChatMessages.vue -->
 <template>
   <div class="chat-messages" ref="messagesContainer">
-    <!-- 使用 transition-group 包裹消息循环 -->
+    <!-- 使用 transition-group 实现消息列表动画 -->
     <transition-group name="message-transition" tag="div" class="message-list-wrapper">
-      <!-- 每个消息项作为 transition-group 的子元素 -->
+      <!-- 循环渲染每条消息 -->
       <div v-for="(msg) in messages" :key="msg.id" :class="['message-wrapper', msg.role]">
-          <div :class="['message', msg.role]">
-              <!-- 加载指示器: 仅当是助手消息、正在处理中且尚无内容时显示 -->
-              <template v-if="msg.role === 'assistant' && msg.isProcessing && !msg.content">
-                <div class="loading-indicator">
-                  <span class="dot"></span>
-                  <span class="dot"></span>
-                  <span class="dot"></span>
+        <div :class="['message', msg.role]">
+
+          <!-- === 助手消息 (Assistant) - 流式处理逻辑 === -->
+          <template v-if="msg.role === 'assistant'">
+            <!-- 统一的消息内容容器 -->
+            <div class="assistant-content-area">
+              <!--
+                加载指示器:
+                仅在消息正在处理中 (isProcessing=true) 且 内容完全为空 (content='') 时显示。
+              -->
+              <div class="loading-indicator" v-if="msg.isProcessing && msg.content === ''">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+              </div>
+
+              <!--
+                消息文本内容:
+                使用 v-if 确保只在 content 确实有值时渲染 Markdown。
+              -->
+              <div class="content" v-if="msg.content" v-html="renderMarkdown(msg.content)"></div>
+
+              <!-- 消息文件列表 (如果有) -->
+              <div v-if="msg.message_files && msg.message_files.length > 0" class="message-files">
+                <div v-for="file in msg.message_files" :key="file.id" class="file-display">
+                  <!-- 图片文件 -->
+                  <el-image v-if="file.type === 'image'" :src="file.url" :preview-src-list="[file.url]" fit="contain"
+                    lazy class="message-image" hide-on-click-modal />
+                  <!-- 其他文件类型 (链接) -->
+                  <a v-else :href="file.url" target="_blank" rel="noopener noreferrer" class="file-link">
+                    <el-icon>
+                      <Document />
+                    </el-icon>
+                    {{ getFileNameFromUrl(file.url) || '附件' }}
+                  </a>
                 </div>
-              </template>
+              </div>
 
-              <!-- 实际消息内容: 仅当有内容或处理完成时显示 -->
-              <template v-else>
-                <!-- 显示消息内容 -->
-                <div class="content" v-html="renderMarkdown(msg.content)"></div>
+              <!-- 错误标记 (在 message_end 中设置 metadata.error) -->
+              <div v-if="msg.metadata?.error" class="metadata error-flag">
+                <el-icon>
+                  <WarningFilled />
+                </el-icon> (发生错误)
+              </div>
 
-                <!-- 显示消息文件 (保持不变) -->
-                <div v-if="msg.message_files && msg.message_files.length > 0" class="message-files">
-                    <div v-for="file in msg.message_files" :key="file.id" class="file-display">
-                    <el-image
-                        v-if="file.type === 'image'"
-                        :src="file.url"
-                        :preview-src-list="[file.url]"
-                        fit="contain" lazy class="message-image" hide-on-click-modal />
-                    <a v-else :href="file.url" target="_blank" rel="noopener noreferrer" class="file-link">
-                        <el-icon><Document /></el-icon>
-                        {{ getFileNameFromUrl(file.url) || '附件' }}
-                    </a>
-                    </div>
-                </div>
+              <!--
+                 复制按钮:
+                 仅当有内容时显示。
+               -->
+              <div v-if="msg.content" class="copy-action">
+                <el-tooltip content="复制" placement="top" :enterable="false">
+                  <el-button text circle size="small" :icon="CopyDocument" @click="copyToClipboard(msg.content)"
+                    class="copy-btn" />
+                </el-tooltip>
+              </div>
+            </div>
+          </template>
 
-                <!-- 显示错误标记 (保持不变) -->
-                <div v-if="msg.metadata?.error" class="metadata error-flag">
-                     <el-icon><WarningFilled /></el-icon> (发生错误)
-                </div>
+          <!-- === 用户消息 (User) === -->
+          <template v-else>
+            <!-- 消息文本内容 -->
+            <div class="content" v-html="renderMarkdown(msg.content)"></div>
 
-                 <!-- 助手消息的复制按钮 (保持不变) -->
-                 <div v-if="msg.role === 'assistant' && msg.content" class="copy-action">
-                     <el-tooltip content="复制" placement="top" :enterable="false">
-                        <el-button
-                            text
-                            circle
-                            size="small"
-                            :icon="CopyDocument"
-                            @click="copyToClipboard(msg.content)"
-                            class="copy-btn"
-                        />
-                     </el-tooltip>
-                 </div>
-              </template>
+            <!-- 消息文件列表 (如果有) -->
+            <div v-if="msg.message_files && msg.message_files.length > 0" class="message-files">
+              <div v-for="file in msg.message_files" :key="file.id" class="file-display">
+                <!-- 图片文件 -->
+                <el-image v-if="file.type === 'image'" :src="file.url" :preview-src-list="[file.url]" fit="contain" lazy
+                  class="message-image" hide-on-click-modal />
+                <!-- 其他文件类型 (链接) -->
+                <a v-else :href="file.url" target="_blank" rel="noopener noreferrer" class="file-link">
+                  <el-icon>
+                    <Document />
+                  </el-icon>
+                  {{ getFileNameFromUrl(file.url) || '附件' }}
+                </a>
+              </div>
+            </div>
+          </template>
 
-              <!-- 点赞/点踩/朗读 操作按钮区域已被移除 -->
-          </div>
+        </div>
       </div>
-    </transition-group> <!-- 结束 transition-group -->
+    </transition-group>
   </div>
 </template>
 
 <script setup lang="ts">
-// 移除未使用的导入: Headset, Top, Bottom, Link
-import { ref, watch, nextTick, onMounted } from 'vue';
-// ElButton 可能仍需要用于 copy 按钮, ElTooltip 也是
-import { ElImage, ElIcon, ElButton, ElTooltip, ElMessage } from 'element-plus';
-// 移除未使用的图标: Headset, Top, Bottom, Link
-// 引入复制图标: CopyDocument
-import { Document, WarningFilled, CopyDocument } from '@element-plus/icons-vue';
-import MarkdownIt from 'markdown-it';
+  // 核心 Vue API
+  import { ref, watch, nextTick, onMounted } from 'vue';
+  // Element Plus 组件
+  import { ElImage, ElIcon, ElButton, ElTooltip, ElMessage } from 'element-plus';
+  // Element Plus 图标
+  import { Document, WarningFilled, CopyDocument } from '@element-plus/icons-vue';
+  // Markdown 处理
+  import MarkdownIt from 'markdown-it';
+  // 消息类型定义
+  import type { Message } from '@/types/ChatMessageType.ts';
 
-// --- Markdown 渲染器 (保持不变) ---
-const md = new MarkdownIt({
-  html: false, // 通常不直接渲染 HTML 以防 XSS，除非你完全信任来源或做了净化
-  linkify: true, // 自动将 URL 转为链接
-  typographer: true, // 启用一些标点符号和引用的美化
-});
-const renderMarkdown = (text: string = '') => {
-    // 【重要】在生产环境中，如果 Markdown 内容可能来自不可信来源，
-    // 请务必使用 DOMPurify 或类似库对 md.render() 的结果进行净化！
-    // import DOMPurify from 'dompurify';
-    // return DOMPurify.sanitize(md.render(text));
-    return md.render(text); // 返回渲染后的 HTML 字符串
-};
-
-// --- 接口定义 (添加 isProcessing) ---
-interface RetrieverResource { /* ... */ } // 如需使用，保持定义
-interface MessageFile { id: string; type: string; url: string; belongs_to: 'user' | 'assistant'; }
-
-interface Message {
-  id: string; // 消息唯一 ID
-  role: 'user' | 'assistant'; // 角色：用户或助手
-  content: string; // 消息文本内容
-  message_files?: MessageFile[]; // 关联的文件
-  metadata?: { // 元数据
-    retriever_resources?: RetrieverResource[]; // 引用来源 (如果使用)
-    error?: boolean; // 是否为错误消息
-    usage?: object; // token 使用情况等 (如果需要)
-    [key: string]: any; // 其他可能的元数据
+  // --- Markdown 渲染器 ---
+  const md = new MarkdownIt({
+    html: false,
+    linkify: true,
+    typographer: true,
+  });
+  const renderMarkdown = (text: string = '') => {
+    // 生产环境注意 XSS 净化
+    return md.render(text);
   };
-  created_at?: number; // 创建时间戳 (秒)
-  isProcessing?: boolean; // 新增：标记助手消息是否仍在生成中
-}
 
-// --- Props (保持不变) ---
-const props = defineProps<{
-  messages: Message[]; // 接收消息数组
-}>();
+  // --- 组件 Props ---
+  const props = defineProps<{
+    messages: Message[]; // 由父组件维护和更新的消息数组
+  }>();
 
+  // --- DOM 引用 ---
+  const messagesContainer = ref<HTMLDivElement | null>(null);
 
-// --- Refs & Lifecycle (保持不变) ---
-const messagesContainer = ref<HTMLDivElement | null>(null); // 对消息容器元素的引用
+  // --- 滚动控制 ---
+  const scrollToBottom = async (behavior: ScrollBehavior = 'smooth') => {
+    await nextTick();
+    if (messagesContainer.value) {
+      // 检查是否接近底部，如果是，则滚动；否则可能用户正在查看历史记录，不强制滚动
+      const threshold = 100; // 距离底部的像素阈值
+      const isNearBottom = messagesContainer.value.scrollHeight - messagesContainer.value.scrollTop - messagesContainer.value.clientHeight < threshold;
 
-// 滚动到底部的函数
-const scrollToBottom = async (behavior: ScrollBehavior = 'smooth') => {
-  // 等待 DOM 更新完成
-  await nextTick();
-  if (messagesContainer.value) {
-    // 执行滚动
-    messagesContainer.value.scrollTo({ top: messagesContainer.value.scrollHeight, behavior: behavior });
-  }
-};
+      // 只有当新消息是最后一条，或者容器当前就在底部附近时才滚动
+      if (behavior === 'smooth' && !isNearBottom) {
+        // 如果用户不在底部，且是平滑滚动（通常意味着是新消息），可以选择不滚动或提供一个"新消息"提示
+      } else {
+        messagesContainer.value.scrollTo({
+          top: messagesContainer.value.scrollHeight,
+          behavior: behavior
+        });
+      }
+    }
+  };
 
-// 监听消息数组的变化，自动滚动到底部
-watch(() => props.messages, (newMessages, oldMessages) => {
-    // 如果是新增消息，使用平滑滚动；如果是加载历史记录等，可能用 'auto' 瞬间滚动
-    const behavior = newMessages.length > oldMessages.length ? 'smooth' : 'auto';
+  // --- 监听与生命周期 ---
+  // 监听消息数组的变化 (包括内部属性如 content, isProcessing)
+  watch(() => props.messages, (newMessages, oldMessages) => {
+    // 判断是新增消息还是内容更新
+    const isNewMessageAdded = newMessages.length > oldMessages.length;
+    // 查找最后一条消息是否正在流式更新 (它的 content 变化了但 isProcessing 还是 true)
+    const lastMessage = newMessages[newMessages.length - 1];
+    const oldLastMessage = oldMessages[oldMessages.length - 1];
+    const isLastMessageStreaming = !isNewMessageAdded && newMessages.length > 0 &&
+      lastMessage.id === oldLastMessage?.id &&
+      lastMessage.role === 'assistant' &&
+      lastMessage.isProcessing &&
+      lastMessage.content !== oldLastMessage?.content;
+
+    // 新增消息或流式更新最后一条消息时，平滑滚动
+    // 其他情况（如加载历史）用 'auto'
+    const behavior = (isNewMessageAdded || isLastMessageStreaming) ? 'smooth' : 'auto';
+
     scrollToBottom(behavior);
-}, { deep: true }); // 深度监听，确保消息内部属性变化也能触发
+  }, { deep: true });
 
-// 组件挂载后滚动到底部
-onMounted(() => {
-  scrollToBottom('auto'); // 初始加载，瞬间滚动
-});
+  // 组件挂载后滚动到底部
+  onMounted(() => {
+    scrollToBottom('auto');
+  });
 
-
-// 保留: 从 URL 获取文件名
-const getFileNameFromUrl = (url: string): string | null => {
+  // --- 工具函数 ---
+  const getFileNameFromUrl = (url: string): string | null => {
     try {
-        // 尝试使用 URL API 解析
-        const pathname = new URL(url).pathname;
-        const parts = pathname.split('/');
-        return decodeURIComponent(parts[parts.length - 1]) || null; // 解码文件名
+      const pathname = new URL(url).pathname;
+      const filename = decodeURIComponent(pathname.substring(pathname.lastIndexOf('/') + 1));
+      return filename || null;
     } catch (e) {
-        // 如果 URL 无效，尝试简单分割
-        const parts = url.split('/');
-        const possibleFilename = parts[parts.length - 1];
-        // 尝试去除可能的查询参数
-        const queryIndex = possibleFilename.indexOf('?');
-        return decodeURIComponent(queryIndex !== -1 ? possibleFilename.substring(0, queryIndex) : possibleFilename) || null;
+      console.warn('无法解析文件名:', url, e);
+      const parts = url.split('/');
+      const possibleFilename = parts[parts.length - 1] || '';
+      const queryIndex = possibleFilename.indexOf('?');
+      const filename = decodeURIComponent(queryIndex !== -1 ? possibleFilename.substring(0, queryIndex) : possibleFilename);
+      return filename || null;
     }
-};
+  };
 
-// 保留: 复制到剪贴板方法
-const copyToClipboard = async (text: string) => {
+  const copyToClipboard = async (text: string) => {
     if (!navigator.clipboard) {
-        // 兼容性检查
-        ElMessage.error('您的浏览器不支持或未启用剪贴板功能');
-        return;
+      ElMessage.error('浏览器不支持剪贴板功能'); return;
     }
     try {
-        // 执行复制
-        await navigator.clipboard.writeText(text);
-        ElMessage.success('已复制到剪贴板');
+      await navigator.clipboard.writeText(text);
+      ElMessage.success('已复制');
     } catch (err) {
-        console.error('无法复制文本: ', err);
-        ElMessage.error('复制失败，请检查浏览器权限或手动复制');
+      console.error('复制失败: ', err);
+      ElMessage.error('复制失败');
     }
-};
+  };
 
 </script>
 
 <style scoped>
-.chat-messages {
-  flex-grow: 1; /* 占据可用垂直空间 */
-  overflow-y: auto; /* 超出内容时垂直滚动 */
-  padding: 20px 15px; /* 增加上下内边距 */
-  background-color: #ffffff; /* 纯白背景 */
-  display: flex;
-  flex-direction: column; /* 垂直排列消息 */
-}
-
-/* transition-group 需要一个包裹元素，这里我们添加一个 */
-.message-list-wrapper {
+  /* --- 核心布局和通用样式 --- */
+  .chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 20px 15px;
+    background-color: #ffffff;
     display: flex;
     flex-direction: column;
-    gap: 20px; /* 设置消息之间的间距 */
-}
+  }
 
-.message-wrapper {
-  display: flex;
-  /* margin-bottom: 20px; */ /* 使用 gap 代替 margin */
-  max-width: calc(100% - 40px); /* 限制最大宽度，两侧留有空间 */
-  width: fit-content; /* 让包裹器宽度适应内容 */
-}
-.message-wrapper.user {
-    align-self: flex-end; /* 用户消息靠右 */
-    margin-left: auto; /* 确保在 flex 容器中靠右 */
-}
-.message-wrapper.assistant {
-    align-self: flex-start; /* 助手消息靠左 */
-    margin-right: auto; /* 确保在 flex 容器中靠左 */
-}
+  .message-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
 
-.message {
-  /* padding: 10px 15px; */ /* 内边距由子元素或特定角色定义 */
-  border-radius: 20px; /* 非常圆润的边角 (对 user 生效) */
-  word-wrap: break-word; /* 长单词换行 */
-  position: relative; /* 用于复制按钮等绝对定位子元素 */
-  line-height: 1.6; /* 改善可读性 */
-  font-size: 14px; /* 标准字体大小 */
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04); /* 轻微阴影 (对 user 生效) */
-  min-height: 20px; /* 确保即使内容为空也有最小高度 */
-}
+  .message-wrapper {
+    display: flex;
+    max-width: calc(100% - 40px);
+    width: fit-content;
+  }
 
-/* 用户消息样式 */
-.message.user {
-  padding: 8px 15px; /* 用户消息内边距 */
-  background-color: #f4f4f5; /* 浅灰色背景 */
-  color: #1f2937; /* 深灰色文字 */
-  border-bottom-right-radius: 6px; /* 轻微调整右下角形状 */
-}
+  .message-wrapper.user {
+    align-self: flex-end;
+    margin-left: auto;
+  }
 
-/* 助手消息样式 */
-.message.assistant {
-  background-color: transparent; /* 无背景 */
-  color: #1f2937; /* 深灰色文字 */
-  padding: 0; /* 移除内边距，文本直接显示 */
-  border: none; /* 移除边框 */
-  box-shadow: none; /* 移除阴影 */
-  border-radius: 0; /* 无圆角 */
-  /* 如果需要为加载状态或内容设置一个最小宽度，可以在这里加 min-width */
-}
+  .message-wrapper.assistant {
+    align-self: flex-start;
+    margin-right: auto;
+  }
 
-.content {
-  /* white-space: pre-wrap; */ /* markdown-it 会处理换行 */
-  white-space: normal; /* 确保浏览器正常处理换行 */
-}
+  .message {
+    word-wrap: break-word;
+    position: relative;
+    line-height: 1.6;
+    font-size: 14px;
+    min-height: 20px;
+  }
 
-/* 调整 Markdown 内部样式，适应无背景情况 */
-/* 使用 :deep() 或 ::v-deep 穿透 scoped CSS */
-.message.assistant .content :deep(p) { margin: 0 0 0.5em 0; }
-.message.assistant .content :deep(p:last-child) { margin-bottom: 0; }
-.message.assistant .content :deep(a) { color: #3b82f6; text-decoration: underline;} /* 蓝色链接 */
-.message.assistant .content :deep(code):not(pre code) { /* 行内代码 */
+  /* --- 用户消息样式 --- */
+  .message.user {
+    padding: 8px 15px;
+    background-color: #f4f4f5;
+    color: #1f2937;
+    border-radius: 20px;
+    border-bottom-right-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  /* --- 助手消息样式 --- */
+  .message.assistant {
+    background-color: transparent;
+    color: #1f2937;
+    padding: 0;
+  }
+
+  /* --- 助手内容区域 --- */
+  .assistant-content-area {
+    min-height: 20px;
+    padding: 4px 0;
+    position: relative;
+    /* background-color: blue; */
+  }
+
+  /* --- 内容区域 --- */
+  .content {
+    white-space: normal;
+  }
+
+  .message.assistant .content {
+    padding: 0;
+  }
+
+  /* --- 加载指示器 --- */
+  .loading-indicator {
+    display: flex;
+    align-items: center;
+    height: 20px;
+  }
+
+  .loading-indicator .dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    margin-right: 4px;
+    border-radius: 50%;
+    background-color: #9ca3af;
+    animation: loading-pulse 1.4s infinite ease-in-out both;
+  }
+
+  .loading-indicator .dot:nth-child(1) {
+    animation-delay: -0.32s;
+  }
+
+  .loading-indicator .dot:nth-child(2) {
+    animation-delay: -0.16s;
+  }
+
+  .loading-indicator .dot:last-child {
+    margin-right: 0;
+  }
+
+  @keyframes loading-pulse {
+    0%,
+    80%,
+    100% {
+      transform: scale(0.8);
+      opacity: 0.5;
+    }
+
+    40% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+
+  .message-transition-enter-from {
+    opacity: 0;
+    transform: translateY(15px) scale(0.98);
+  }
+
+  .message-transition-leave-to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  /* --- Markdown 内容样式 (:deep()) --- */
+  .message .content :deep(p) {
+    margin: 0 0 0.5em 0;
+  }
+
+  .message .content :deep(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .message .content :deep(a) {
+    color: #3b82f6;
+    text-decoration: underline;
+  }
+
+  .message .content :deep(code):not(pre code) {
     background-color: #f3f4f6;
     padding: 0.1em 0.4em;
     border-radius: 4px;
     font-size: 0.9em;
     color: #4b5563;
-    word-break: break-all; /* 代码内允许断词 */
-}
-.message.assistant .content :deep(pre) { /* 代码块 */
+    word-break: break-all;
+  }
+
+  .message .content :deep(pre) {
     background-color: #f3f4f6;
     padding: 10px;
     border-radius: 6px;
     margin: 0.5em 0;
-    overflow-x: auto; /* 水平滚动 */
+    overflow-x: auto;
     font-size: 0.9em;
-}
-.message.assistant .content :deep(pre code) { /* 代码块内的 code 标签 */
+  }
+
+  .message .content :deep(pre code) {
     background: none;
     padding: 0;
-    color: inherit; /* 继承 pre 的颜色 */
-    word-break: normal; /* 代码块内不随意断词 */
-    white-space: pre; /* 保持代码格式 */
-}
-.message.assistant .content :deep(blockquote) { /* 引用块 */
+    color: inherit;
+    word-break: normal;
+    white-space: pre;
+  }
+
+  .message .content :deep(blockquote) {
     border-left: 3px solid #d1d5db;
     padding-left: 10px;
-    margin: 0.5em 0 0.5em 0;
+    margin: 0.5em 0;
     color: #4b5563;
-}
-.message.assistant .content :deep(ul),
-.message.assistant .content :deep(ol) { /* 列表 */
-    margin: 0.5em 0 0.5em 20px; /* 列表的内外边距 */
+  }
+
+  .message .content :deep(ul),
+  .message .content :deep(ol) {
+    margin: 0.5em 0 0.5em 20px;
     padding-left: 20px;
-}
-.message.assistant .content :deep(li) { /* 列表项 */
+  }
+
+  .message .content :deep(li) {
     margin-bottom: 0.3em;
-}
-
-/* --- 新增：加载指示器样式 --- */
-.loading-indicator {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start; /* 让点靠左 */
-  padding: 8px 0px; /* 给点一些垂直空间，与文本大致对齐 */
-  min-height: 20px; /* 确保有高度 */
-}
-
-.loading-indicator .dot {
-  display: inline-block;
-  width: 7px; /* 点的大小 */
-  height: 7px; /* 点的大小 */
-  margin-right: 4px; /* 点之间的距离 */
-  border-radius: 50%;
-  background-color: #9ca3af; /* 点的颜色 (灰色) */
-  animation: loading-pulse 1.4s infinite ease-in-out both; /* 应用动画 */
-}
-/* 动画延迟，制造依次跳动的效果 */
-.loading-indicator .dot:nth-child(1) {
-  animation-delay: -0.32s;
-}
-.loading-indicator .dot:nth-child(2) {
-  animation-delay: -0.16s;
-}
-/* 最后一个点不需要右边距 */
-.loading-indicator .dot:last-child {
-    margin-right: 0;
-}
-
-/* 定义跳动动画 */
-@keyframes loading-pulse {
-  0%, 80%, 100% {
-    transform: scale(0.8); /* 缩小状态 */
-    opacity: 0.5; /* 半透明 */
   }
-  40% {
-    transform: scale(1); /* 放大状态 */
-    opacity: 1; /* 完全不透明 */
+
+  /* --- 消息文件样式 --- */
+  .message-files {
+    margin-top: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
   }
-}
 
-/* --- 新增：消息过渡动画 --- */
-.message-transition-enter-active,
-.message-transition-leave-active {
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); /* 定义过渡效果 */
-}
-/* 进入动画的起始状态 */
-.message-transition-enter-from {
-  opacity: 0;
-  transform: translateY(15px) scale(0.98); /* 从下方轻微上移并放大 */
-}
-/* 离开动画的结束状态 (通常较少用到，但可以定义) */
-.message-transition-leave-to {
-  opacity: 0;
-  transform: scale(0.95); /* 离开时轻微缩小 */
-}
+  .file-display {
+    max-width: 150px;
+  }
 
+  .message-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 150px;
+    object-fit: contain;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid #eee;
+  }
 
-/* 消息文件区域 (保持不变) */
-.message-files { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; }
-.file-display { max-width: 150px; }
-.message-image { display: block; width: 100%; height: auto; max-height: 150px; object-fit: contain; border-radius: 6px; cursor: pointer; border: 1px solid #eee;}
-.file-link { display: inline-flex; align-items: center; padding: 5px 8px; background-color: #f0f0f0; border-radius: 4px; color: #333; text-decoration: none; font-size: 0.9em; word-break: break-all; }
-.file-link:hover { background-color: #e0e0e0; }
-.file-link .el-icon { margin-right: 4px; }
+  .file-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 8px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9em;
+    word-break: break-all;
+  }
 
-/* 错误标记 (保持不变) */
-.metadata.error-flag {
+  .file-link:hover {
+    background-color: #e0e0e0;
+  }
+
+  .file-link .el-icon {
+    margin-right: 4px;
+  }
+
+  /* --- 元数据和操作按钮 --- */
+  .metadata.error-flag {
     margin-top: 8px;
     color: #ef4444;
     font-weight: 500;
@@ -359,29 +437,29 @@ const copyToClipboard = async (text: string) => {
     align-items: center;
     gap: 4px;
     font-size: 0.85em;
-}
+  }
 
-/* 复制按钮样式 (保持不变) */
-.copy-action {
+  .copy-action {
     margin-top: 5px;
-    text-align: left; /* 确保按钮在左侧 */
-    height: 20px; /* 控制区域高度 */
-    opacity: 0; /* 默认隐藏 */
-    transition: opacity 0.2s ease-in-out; /* 平滑显示 */
-}
-/* 消息悬停时显示复制按钮 */
-.message-wrapper:hover .copy-action {
-    opacity: 1;
-}
+    text-align: left;
+    height: 20px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
 
-.copy-btn {
-    padding: 2px !important; /* 非常小的内边距 */
-    color: #9ca3af; /* 灰色图标 */
-    font-size: 14px; /* 图标大小 */
+  .message-wrapper:hover .copy-action {
+    opacity: 1;
+  }
+
+  .copy-btn {
+    padding: 2px !important;
+    color: #9ca3af;
+    font-size: 14px;
     border-radius: 4px;
-}
-.copy-btn:hover {
-    color: #1f2937; /* 悬停时变深 */
-    background-color: #f3f4f6; /* 轻微背景 */
-}
+  }
+
+  .copy-btn:hover {
+    color: #1f2937;
+    background-color: #f3f4f6;
+  }
 </style>
