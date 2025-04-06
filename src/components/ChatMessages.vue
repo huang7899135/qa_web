@@ -1,6 +1,6 @@
 <!-- src/components/ChatMessages.vue -->
 <template>
-  <div class="chat-messages" ref="messagesContainer">
+  <div class="chat-messages" >
     <!-- 使用 transition-group 实现消息列表动画 -->
     <transition-group name="message-transition" tag="div" class="message-list-wrapper">
       <!-- 循环渲染每条消息 -->
@@ -125,17 +125,18 @@
   // --- 滚动控制 ---
   const scrollToBottom = async (behavior: ScrollBehavior = 'smooth') => {
     await nextTick();
-    if (messagesContainer.value) {
+    const scrollContainer = document.querySelector('.scrollable-content');
+    if (scrollContainer) {
       // 检查是否接近底部，如果是，则滚动；否则可能用户正在查看历史记录，不强制滚动
       const threshold = 100; // 距离底部的像素阈值
-      const isNearBottom = messagesContainer.value.scrollHeight - messagesContainer.value.scrollTop - messagesContainer.value.clientHeight < threshold;
+      const isNearBottom = scrollContainer.scrollHeight - messagesContainer.value.scrollTop - messagesContainer.value.clientHeight < threshold;
 
       // 只有当新消息是最后一条，或者容器当前就在底部附近时才滚动
       if (behavior === 'smooth' && !isNearBottom) {
         // 如果用户不在底部，且是平滑滚动（通常意味着是新消息），可以选择不滚动或提供一个"新消息"提示
       } else {
-        messagesContainer.value.scrollTo({
-          top: messagesContainer.value.scrollHeight,
+        scrollContainer.scrollTo({
+          top: scrollContainer.scrollHeight,
           behavior: behavior
         });
       }
@@ -200,14 +201,15 @@
 </script>
 
 <style scoped>
+
   /* --- 核心布局和通用样式 --- */
   .chat-messages {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 20px 15px;
     background-color: #ffffff;
     display: flex;
     flex-direction: column;
+    width: 100%; /* 确保填满父容器 */
+    height: auto; /* 自动高度 */
+    overflow: visible; /* 显示溢出内容 */
   }
 
   .message-list-wrapper {
@@ -304,6 +306,7 @@
   }
 
   @keyframes loading-pulse {
+
     0%,
     80%,
     100% {

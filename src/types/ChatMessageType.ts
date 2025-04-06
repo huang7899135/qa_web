@@ -1,5 +1,5 @@
   // --- 消息接口定义 (与 ChatMessages.vue 保持一致) ---
-  import type {RetrieverResource, Usage} from "@/api"
+  // import type {RetrieverResource, Usage} from "@/api"
 
   interface MessageFile {
     id: string;
