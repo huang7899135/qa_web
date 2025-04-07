@@ -22,6 +22,7 @@ lerna-debug.log*
 # ========================
 node_modules/
 dist/          # 生产构建输出
+dist
 dist-ssr/      # SSR 构建输出
 .coverage/     # 测试覆盖率报告
 .nyc_output/   # Istanbul 测试覆盖率临时文件
@@ -29,6 +30,7 @@ dist-ssr/      # SSR 构建输出
 # ========================
 # IDE 和编辑器配置
 # ========================
+.vscode
 .vscode/*
 !.vscode/extensions.json  # 允许共享推荐的插件配置
 .idea/
@@ -67,3 +69,4 @@ jest-stare/           # Jest 可视化报告
 # yarn.lock       # 如果用 Yarn 则取消注释
 # package-lock.json # 如果用 npm 则取消注释
 # pnpm-lock.yaml  # 如果用 pnpm 则取消注释
+src/.DS_Store

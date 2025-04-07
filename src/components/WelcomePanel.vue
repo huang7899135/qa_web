@@ -418,7 +418,8 @@
     border: 1px solid #e5e7eb;
     border-radius: 8px;
     overflow: hidden;
-    background-color: #f9fafb;
+    /* background-color: #f9fafb; */
+    background-color: #fff;
     transition: box-shadow 0.2s ease, background-color 0.2s ease;
   }
 
@@ -450,7 +451,8 @@
   .category-title .el-icon {
     font-size: 18px;
     margin-right: 10px;
-    color: #4b5563;
+    color: var(--el-color-primary);
+    /* color: #4b5563; */
     flex-shrink: 0;
   }
 
