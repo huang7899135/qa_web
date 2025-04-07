@@ -10,6 +10,7 @@ export default defineConfig({
     }
   },
   build: {
-    sourcemap: true
+    outDir: 'dist', // 输出目录
+    sourcemap: false  // 关闭 source map，提升安全性
   }
 })

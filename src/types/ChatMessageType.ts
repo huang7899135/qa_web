@@ -17,14 +17,24 @@
       total_tokens?: number;
       [key: string]: any; // 其他用量相关字段
     };
-    retriever_resources?: Array<{ // 假设这是引用来源的结构
+    retriever_resources?: Array<{ 
       position: number;
-      dataset_id: string;
-      document_id: string;
-      document_name: string;
-      segment_id: string;
-      content: string;
-      [key: string]: any; // 其他来源相关字段
+      dataset_id?: string;       
+      dataset_name?: string;     
+      document_id?: string;      
+      document_name?: string;    
+      segment_id?: string;       
+      retriever_from?: string;   
+      score?: number;            
+      hit_count?: number;        
+      word_count?: number;       
+      segment_position?: number; 
+      index_node_hash?: string;  
+      content: string;           
+      doc_metadata?: any;        
+      page?: number | null;      
+      [key: string]: any;
+    
     }>;
     [key: string]: any; // 允许其他元数据
   }

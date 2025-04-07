@@ -129,7 +129,8 @@
     if (scrollContainer) {
       // 检查是否接近底部，如果是，则滚动；否则可能用户正在查看历史记录，不强制滚动
       const threshold = 100; // 距离底部的像素阈值
-      const isNearBottom = scrollContainer.scrollHeight - messagesContainer.value.scrollTop - messagesContainer.value.clientHeight < threshold;
+      const isNearBottom = messagesContainer.value &&
+        scrollContainer.scrollHeight - messagesContainer.value.scrollTop - messagesContainer.value.clientHeight < threshold;
 
       // 只有当新消息是最后一条，或者容器当前就在底部附近时才滚动
       if (behavior === 'smooth' && !isNearBottom) {
