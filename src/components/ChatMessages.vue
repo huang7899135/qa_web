@@ -151,7 +151,6 @@
     }
   };
 
-  // --- 监听与生命周期 ---
   // 监听消息数组的变化 (包括内部属性如 content, isProcessing)
   watch(() => props.messages, (newMessages, oldMessages) => {
     // 判断是新增消息还是内容更新

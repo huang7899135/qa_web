@@ -152,7 +152,7 @@ const handleReferenceClick = (refData: ProcessedReference) => {
 const isSelectAll = ref(false);
 const isIndeterminate = ref(false);
 
-const handleCheckedFilesChange = (value: string[]) => {
+const handleCheckedFilesChange = (value: (string | number | boolean)[]) => {
     const checkedCount = value.length;
     isSelectAll.value = checkedCount === uniqueReferences.value.length && checkedCount > 0; // 修复全选逻辑
     isIndeterminate.value = checkedCount > 0 && checkedCount < uniqueReferences.value.length;
