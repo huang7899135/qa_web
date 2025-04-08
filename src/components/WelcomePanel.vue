@@ -275,12 +275,7 @@ watch(() => props.hasMessages, (newValue, oldValue) => {
     color: #6b7280;
 }
 
-
-/* 移除原有的 toggle-btn 样式 */
-/* .toggle-btn { ... } */
-
-
-/* 可折叠的内容区域 - 保持不变 */
+/* 可折叠的内容区域 - 专注于高度变化 */
 .panel-collapsible-content {
   position: absolute;
   top: 100%;
@@ -294,10 +289,16 @@ watch(() => props.hasMessages, (newValue, oldValue) => {
   padding: 12px 16px 16px;
   box-sizing: border-box;
   z-index: 10;
-  max-height: calc(70vh - 60px); /* 假设 header 最小高度约 60px */
+  max-height: calc(70vh - 60px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  transform-origin: top center;
+  transition: max-height 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              padding 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              margin 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+              border-width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* 内容区的提示文字 - 保持不变 */
@@ -422,16 +423,27 @@ watch(() => props.hasMessages, (newValue, oldValue) => {
 .question-item .el-icon { font-size: 12px; opacity: 0; transition: opacity 0.2s, transform 0.2s; flex-shrink: 0; }
 .question-item:hover .el-icon { opacity: 1; transform: translateX(3px); }
 
-/* 过渡动画 - 保持不变 */
+/* 过渡动画 - 纯缩放折叠效果，去除透明度 */
 .slide-fade-enter-active {
-  transition: all 0.3s ease-out;
+  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
+  transform-origin: top center;
+  max-height: 70vh;
 }
 .slide-fade-leave-active {
-  transition: all 0.2s cubic-bezier(1, 0.5, 0.8, 1);
+  transition: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+  transform-origin: top center;
+  max-height: 0;
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-width: 0;
+  overflow: hidden;
 }
 .slide-fade-enter-from,
 .slide-fade-leave-to {
-  transform: translateY(-10px);
-  opacity: 0;
+  transform: translateY(-10px) scale(0.97);
+  max-height: 0;
+  padding: 0;
+  margin: 0;
 }
 </style>

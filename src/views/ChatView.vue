@@ -2,7 +2,6 @@
   <div class="chat-window">
     <!-- 固定在顶部的 WelcomePanel -->
     <div class="fixed-top">
-      <!-- 移除 @update:minimized 监听, WelcomePanel 内部管理状态 -->
       <WelcomePanel :has-messages="messages.length > 0" @select-question="handleQuestionSelect"
         class="welcome-panel-component" />
     </div>
@@ -10,13 +9,11 @@
     <!-- 内容区域（可滚动部分） -->
     <div class="scrollable-content" ref="scrollableContentRef">
       <!-- 聊天消息 -->
-      <!-- 移除 :class 动态绑定 -->
       <ChatMessages class="chat-messages-area" :messages="messages" />
     </div>
 
     <!-- 固定在底部的聊天输入框 -->
     <div class="fixed-bottom">
-      <!-- 确保 @send-message 绑定的 handleSendMessage 函数存在 -->
       <ChatInput class="chat-input-area" @send-message="handleSendMessage" :disabled="isUploading || isLoading" />
       <div class="disclaimer">
         成都金牛高新技术产业园区管委会提醒您。AI也会犯错,请核查重要信息。

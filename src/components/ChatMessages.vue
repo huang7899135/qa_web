@@ -61,7 +61,6 @@
                 <el-tooltip content="复制" placement="top" :enterable="false">
                   <el-button text circle size="small" :icon="CopyDocument" @click="copyToClipboard(msg.content)"
                     class="copy-btn" />
-                  class="copy-btn" />
                 </el-tooltip>
               </div>
             </div>

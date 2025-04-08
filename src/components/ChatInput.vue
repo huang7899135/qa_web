@@ -30,9 +30,10 @@ const handleSend = () => {
 };
 
 const triggerFileUpload = () => {
-  if (!props.disabled) {
-    fileInputRef.value?.click();
-  }
+  ElMessage.info('文件上传功能待开放');
+  // if (!props.disabled) {
+  //   fileInputRef.value?.click();
+  // }
 };
 
 const handleFileChange = (event: Event) => {
@@ -71,7 +72,7 @@ const handleKeydown = (event: Event) => {
 
 const handleVoiceInput = () => {
    if (!props.disabled) {
-       ElMessage.info('语音输入功能待实现');
+       ElMessage.info('语音输入功能待开放');
        // Add recording logic here
    }
 };
@@ -113,7 +114,7 @@ const handleVoiceInput = () => {
 
     <!-- Action Buttons Footer -->
     <div class="input-actions-footer">
-      <div class="left-actions">
+      <div class="left-actions" v-show="true">
          <!-- File Upload Button - minimal style -->
          <ElTooltip content="附加文件" placement="top">
             <el-button

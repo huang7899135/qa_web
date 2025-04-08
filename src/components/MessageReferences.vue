@@ -182,7 +182,7 @@ const generateAndCopyDownloadLink = async () => {
     try {
         const downloadLink = await fetchDownloadLink(selectedFileIds.value);
         if (downloadLink) {
-            await copyToClipboard(downloadLink);
+            copyToClipboard(downloadLink);
             // ElMessage.success('下载链接已生成并复制到剪贴板！');
             downloadDrawerVisible.value = false;
         } else {
