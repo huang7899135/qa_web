@@ -1,6 +1,6 @@
 <!-- src/components/ChatMessages.vue -->
 <template>
-  <div class="chat-messages" >
+  <div class="chat-messages">
     <!-- 使用 transition-group 实现消息列表动画 -->
     <transition-group name="message-transition" tag="div" class="message-list-wrapper">
       <!-- 循环渲染每条消息 -->
@@ -43,6 +43,9 @@
                 </div>
               </div>
 
+              <!-- 消息引用列表 (如果有) -->
+              <MessageReferences :metadata="msg.metadata" />
+
               <!-- 错误标记 (在 message_end 中设置 metadata.error) -->
               <div v-if="msg.metadata?.error" class="metadata error-flag">
                 <el-icon>
@@ -58,6 +61,7 @@
                 <el-tooltip content="复制" placement="top" :enterable="false">
                   <el-button text circle size="small" :icon="CopyDocument" @click="copyToClipboard(msg.content)"
                     class="copy-btn" />
+                  class="copy-btn" />
                 </el-tooltip>
               </div>
             </div>
@@ -95,11 +99,14 @@
   // 核心 Vue API
   import { ref, watch, nextTick, onMounted } from 'vue';
   // Element Plus 组件
-  import { ElImage, ElIcon, ElButton, ElTooltip, ElMessage } from 'element-plus';
+  import { ElImage, ElIcon, ElButton, ElTooltip } from 'element-plus';
   // Element Plus 图标
   import { Document, WarningFilled, CopyDocument } from '@element-plus/icons-vue';
   // Markdown 处理
   import MarkdownIt from 'markdown-it';
+  // 引入 MessageReferences 组件
+  import MessageReferences from './MessageReferences.vue';
+  import { copyToClipboard } from '@/utils/clipboard.ts';
   // 消息类型定义
   import type { Message } from '@/types/ChatMessageType.ts';
 
@@ -186,19 +193,6 @@
     }
   };
 
-  const copyToClipboard = async (text: string) => {
-    if (!navigator.clipboard) {
-      ElMessage.error('浏览器不支持剪贴板功能'); return;
-    }
-    try {
-      await navigator.clipboard.writeText(text);
-      ElMessage.success('已复制');
-    } catch (err) {
-      console.error('复制失败: ', err);
-      ElMessage.error('复制失败');
-    }
-  };
-
 </script>
 
 <style scoped>
@@ -208,20 +202,24 @@
     background-color: #ffffff;
     display: flex;
     flex-direction: column;
-    width: 100%; /* 确保填满父容器 */
-    height: auto; /* 自动高度 */
-    overflow: visible; /* 显示溢出内容 */
+    width: 100%;
+    /* 确保填满父容器 */
+    height: auto;
+    /* 自动高度 */
+    overflow: visible;
+    /* 显示溢出内容 */
   }
 
   .message-list-wrapper {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    padding-bottom: 15px;
   }
 
   .message-wrapper {
     display: flex;
-    max-width: calc(100% - 40px);
+    /* max-width: calc(100% - 40px); */
     width: fit-content;
   }
 

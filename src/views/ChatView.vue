@@ -343,98 +343,118 @@
 </script>
 
 <style scoped>
-.chat-window {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  max-height: 100vh;
-  overflow: hidden;
-  background-color: #ffffff;
-  position: relative;
-}
+  .chat-window {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+    background-color: #ffffff;
+    position: relative;
+  }
 
-.scrollable-content {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 10px 10px;
-  /* 增加底部内边距，确保最后一条消息不被遮挡 */
-  /* 可以根据实际 ChatInput 高度微调 */
-  padding-bottom: 140px; /* <<--- 调整这个值 */
-  scroll-behavior: smooth;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-}
+  .scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 10px 10px;
+    /* 增加底部内边距，确保最后一条消息不被遮挡 */
+    /* 可以根据实际 ChatInput 高度微调 */
+    padding-bottom: 140px;
+    /* <<--- 调整这个值 */
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
 
-/* 固定顶部区域 */
-.fixed-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 20;
-  padding: 10px;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-}
+  /* 固定顶部区域 */
+  .fixed-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    padding: 10px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+  }
 
-/* 聊天消息区域样式 */
-.chat-messages-area {
-  width: 100%;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 5px;
-  box-sizing: border-box;
-  flex-grow: 1;
-  /* 固定顶部内边距 */
-  padding-top: 75px;
-}
+  /* 聊天消息区域样式 */
+  .chat-messages-area {
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 5px;
+    box-sizing: border-box;
+    flex-grow: 1;
+    /* 固定顶部内边距 */
+    padding-top: 75px;
+  }
 
-/* 固定底部区域 */
-.fixed-bottom {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(5px);
-  /* 移除顶部的阴影，去除分界线 */
-  /* box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06); */ /* <<--- 注释掉或删除此行 */
-  padding: 10px;
-  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
-  z-index: 30;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  /* 固定底部区域 */
+  .fixed-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(5px);
+    /* 移除顶部的阴影，去除分界线 */
+    /* box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06); */
+    /* <<--- 注释掉或删除此行 */
+    padding: 10px;
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 10px);
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-/* 输入框和免责声明样式 (保持不变) */
-.chat-input-area {
-  width: 100%;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-  box-sizing: border-box;
-}
-.disclaimer {
-  text-align: center;
-  font-size: 12px;
-  color: #a0aec0;
-  padding-top: 6px;
-  padding-bottom: 4px;
-  width: 100%;
-  max-width: 800px;
-  box-sizing: border-box;
-}
+  /* 输入框和免责声明样式 (保持不变) */
+  .chat-input-area {
+    width: 100%;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+    box-sizing: border-box;
+  }
 
-/* 滚动条样式 (保持不变) */
-.scrollable-content::-webkit-scrollbar { width: 6px; height: 6px; }
-.scrollable-content::-webkit-scrollbar-track { background: transparent; }
-.scrollable-content::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
-.scrollable-content::-webkit-scrollbar-thumb:hover { background: #adb5bd; }
-.scrollable-content { scrollbar-width: thin; scrollbar-color: #d1d5db transparent; }
+  .disclaimer {
+    text-align: center;
+    font-size: 12px;
+    color: #a0aec0;
+    padding-top: 6px;
+    padding-bottom: 4px;
+    width: 100%;
+    max-width: 800px;
+    box-sizing: border-box;
+  }
+
+  /* 滚动条样式 (保持不变) */
+  .scrollable-content::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollable-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollable-content::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+
+  .scrollable-content::-webkit-scrollbar-thumb:hover {
+    background: #adb5bd;
+  }
+
+  .scrollable-content {
+    scrollbar-width: thin;
+    scrollbar-color: #d1d5db transparent;
+  }
 
 </style>

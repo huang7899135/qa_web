@@ -9,7 +9,7 @@
   }
 
   // 定义更详细的 Metadata 结构 (应与后端 message_end 事件的 metadata 匹配)
-  interface MessageMetadata {
+  export interface MessageMetadata {
     error?: boolean;
     usage?: {
       prompt_tokens?: number;
