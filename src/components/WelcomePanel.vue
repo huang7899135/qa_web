@@ -423,11 +423,16 @@ watch(() => props.hasMessages, (newValue, oldValue) => {
 .question-item .el-icon { font-size: 12px; opacity: 0; transition: opacity 0.2s, transform 0.2s; flex-shrink: 0; }
 .question-item:hover .el-icon { opacity: 1; transform: translateX(3px); }
 
-/* 过渡动画 - 纯缩放折叠效果，去除透明度 */
+/* 过渡动画 - 优化放大和缩小效果 */
 .slide-fade-enter-active {
-  transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
+  transition: all 0.95s cubic-bezier(0.16, 1, 0.3, 1); /* 更强的先快后慢曲线 */
   transform-origin: top center;
   max-height: 70vh;
+  margin-top: 0;
+  padding: 12px 16px 16px;
+  border-width: 1px;
+  opacity: 1;
+  overflow: hidden;
 }
 .slide-fade-leave-active {
   transition: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -441,9 +446,10 @@ watch(() => props.hasMessages, (newValue, oldValue) => {
 }
 .slide-fade-enter-from,
 .slide-fade-leave-to {
-  transform: translateY(-10px) scale(0.97);
+  transform: translateY(-15px) scale(0.96);
   max-height: 0;
   padding: 0;
   margin: 0;
+  opacity: 0.9;
 }
 </style>
