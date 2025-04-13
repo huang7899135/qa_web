@@ -457,7 +457,7 @@ export interface AppMetaResponse {
 // 请确认端口号 :1080 是否正确
 const BASE_URL = 'http://tunnel.gycloud.net:1080/v1';
 // 请替换为你的真实 API Key
-const API_KEY = 'app-F7R3XyL6n93EHmg9gc53lHhp';
+const API_KEY = 'app-zuwHYJqGq3Bogzxk5YurqJqh';
 
 export { BASE_URL }; // 导出 BASE_URL 供外部使用
 
