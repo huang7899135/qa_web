@@ -11,7 +11,8 @@ const routes = [
     path: '/map',
     name: 'Map',
     component: () => import('@/components/MapNavigation.vue')
-  },
+  }
+
 ]
 
 const router = createRouter({

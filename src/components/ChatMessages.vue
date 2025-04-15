@@ -217,8 +217,14 @@
 
   .message-wrapper {
     display: flex;
-    /* max-width: calc(100% - 40px); */
-    width: fit-content;
+    /* === 修改开始：为消息容器添加最大宽度 === */
+    /* 设置一个最大宽度，例如 90% 或 calc(100% - 40px) */
+    /* 这将限制整个消息气泡（包括图片）的最大宽度 */
+    /* width: fit-content; 保留这个，让内容决定实际宽度，但不能超过 max-width */
+    /* max-width: calc(100% - 40px);  或者使用百分比 */
+    max-width: 90%; /* 尝试这个值，或根据你的布局调整 */
+    /* === 修改结束 === */
+    width: fit-content; /* 保留: 宽度适应内容，但不超过 max-width */
   }
 
   .message-wrapper.user {
@@ -237,6 +243,9 @@
     line-height: 1.6;
     font-size: 14px;
     min-height: 20px;
+    /* === 新增：确保 message 也能正确处理溢出（虽然主要靠 wrapper 限制） === */
+    overflow: hidden; /* 可以防止内部元素意外溢出边框 */
+    /* === 新增结束 === */
   }
 
   /* --- 用户消息样式 --- */
@@ -251,6 +260,7 @@
 
   /* --- 助手消息样式 --- */
   .message.assistant {
+    /* 注意：助手消息本身是透明的，宽度由 assistant-content-area 和 message-wrapper 控制 */
     background-color: transparent;
     color: #1f2937;
     padding: 0;
@@ -262,18 +272,30 @@
     padding: 4px 0;
     position: relative;
     /* background-color: blue; */
+    /* === 新增：如果助手消息需要背景和边框，应在此处或 .message.assistant 添加 === */
+    /* 例如，如果希望助手消息也有类似用户的气泡 */
+    /* background-color: #e5e7eb; */
+    /* padding: 8px 15px; */
+    /* border-radius: 20px; */
+    /* border-bottom-left-radius: 6px; */
+    /* box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04); */
+     /* === 新增结束 === */
   }
 
   /* --- 内容区域 --- */
   .content {
     white-space: normal;
+    /* === 新增：确保 content 也不会破坏布局 === */
+    word-break: break-word; /* 在需要时打断长单词 */
+    /* === 新增结束 === */
   }
 
   .message.assistant .content {
-    padding: 0;
+    padding: 0; /* 如果 assistant-content-area 添加了 padding，这里可能需要调整或移除 */
   }
 
   /* --- 加载指示器 --- */
+  /* ... (保持不变) ... */
   .loading-indicator {
     display: flex;
     align-items: center;
@@ -318,6 +340,8 @@
   }
 
 
+  /* --- 过渡动画 --- */
+  /* ... (保持不变) ... */
   .message-transition-enter-from {
     opacity: 0;
     transform: translateY(15px) scale(0.98);
@@ -328,7 +352,9 @@
     transform: scale(0.95);
   }
 
+
   /* --- Markdown 内容样式 (:deep()) --- */
+  /* ... (保持你已有的 p, a, code, pre, blockquote, ul, ol, li 规则) ... */
   .message .content :deep(p) {
     margin: 0 0 0.5em 0;
   }
@@ -385,8 +411,25 @@
     margin-bottom: 0.3em;
   }
 
+  /* === 保持这个规则 === */
+  .message .content :deep(img) {
+    max-width: 100%;
+    /* 关键：限制图片最大宽度为其容器（现在是受限的 .message-wrapper -> .message -> .content）的宽度 */
+    height: auto;
+    /* 关键：高度自动调整以保持原始宽高比 */
+    display: block;
+    /* 可选：将图片设为块级元素，避免下方可能出现的空白 */
+    margin-top: 0.5em;
+    /* 可选：给图片上下添加一些间距 */
+    margin-bottom: 0.5em;
+    border-radius: 6px;
+    /* 可选：给图片添加圆角，与文件图片样式统一 */
+  }
+  /* === 保持结束 === */
+
   /* --- 消息文件样式 --- */
-  .message-files {
+  /* ... (保持不变) ... */
+   .message-files {
     margin-top: 8px;
     display: flex;
     flex-wrap: wrap;
@@ -429,7 +472,8 @@
   }
 
   /* --- 元数据和操作按钮 --- */
-  .metadata.error-flag {
+  /* ... (保持不变) ... */
+   .metadata.error-flag {
     margin-top: 8px;
     color: #ef4444;
     font-weight: 500;
@@ -462,4 +506,5 @@
     color: #1f2937;
     background-color: #f3f4f6;
   }
+
 </style>

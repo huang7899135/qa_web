@@ -20,11 +20,6 @@
           <img src="https://map.baidu.com/favicon.ico" alt="百度图标" class="map-icon" />
           百度地图导航
         </button>
-        <!-- 可以添加腾讯地图等其他选项 -->
-        <!-- <button @click="launchTencentMap" class="map-button tencent">
-          <img src="https://map.qq.com/favicon.ico" alt="腾讯图标" class="map-icon" />
-          腾讯地图导航
-        </button> -->
       </div>
   
       <!-- 提示信息 -->
