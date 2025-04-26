@@ -32,7 +32,7 @@
   import WelcomePanel from '@/components/WelcomePanel.vue';
   import { sendChatMessageStream, uploadFile } from '@/api'; // 假设 api 文件路径正确
   // 引入需要的类型，确保路径正确
-  import type { ChunkChatCompletionResponse, ChatMessageRequest, RequestFile, FileUploadResponse } from '@/api'; // 假设 api 文件路径正确
+  import type { ChunkChatCompletionResponse, ChatMessageRequest, RequestFile, FileUploadResponse } from '@/api/types'; // 假设 api 文件路径正确
   import type { Message } from '@/types/ChatMessageType.ts'; // 假设 types 文件路径正确
   import { ElMessage } from 'element-plus';
 

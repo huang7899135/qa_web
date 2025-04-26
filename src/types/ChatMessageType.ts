@@ -1,5 +1,4 @@
   // --- 消息接口定义 (与 ChatMessages.vue 保持一致) ---
-  // import type {RetrieverResource, Usage} from "@/api"
 
   interface MessageFile {
     id: string;
@@ -15,7 +14,7 @@
       prompt_tokens?: number;
       completion_tokens?: number;
       total_tokens?: number;
-      [key: string]: any; // 其他用量相关字段
+      [key: string]: any;
     };
     retriever_resources?: Array<{ 
       position: number;

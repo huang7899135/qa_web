@@ -201,11 +201,8 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    /* 确保填满父容器 */
     height: auto;
-    /* 自动高度 */
     overflow: visible;
-    /* 显示溢出内容 */
   }
 
   .message-list-wrapper {
@@ -217,13 +214,7 @@
 
   .message-wrapper {
     display: flex;
-    /* === 修改开始：为消息容器添加最大宽度 === */
-    /* 设置一个最大宽度，例如 90% 或 calc(100% - 40px) */
-    /* 这将限制整个消息气泡（包括图片）的最大宽度 */
-    /* width: fit-content; 保留这个，让内容决定实际宽度，但不能超过 max-width */
-    /* max-width: calc(100% - 40px);  或者使用百分比 */
-    max-width: 90%; /* 尝试这个值，或根据你的布局调整 */
-    /* === 修改结束 === */
+    max-width: 100%; /* 尝试这个值，或根据你的布局调整 */
     width: fit-content; /* 保留: 宽度适应内容，但不超过 max-width */
   }
 

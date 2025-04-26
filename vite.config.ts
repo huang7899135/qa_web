@@ -12,5 +12,10 @@ export default defineConfig({
   build: {
     outDir: 'dist', // 输出目录
     sourcemap: false  // 关闭 source map，提升安全性
+  },
+  server: { // 添加 server 配置
+    allowedHosts: [
+      'visionblue.cloud' // 添加你的反向代理主机名
+    ]
   }
 })
