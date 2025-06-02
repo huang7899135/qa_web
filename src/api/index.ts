@@ -5,7 +5,7 @@ import type { AppInfoResponse, AppMetaResponse, AppParametersResponse, AudioToTe
 
 const BACKEND_AUTH_URL = ""
 // --- API 配置 ---
-const BASE_URL = 'http://visionblue.cloud/qa/ai';
+const BASE_URL = 'http://visionblue.cloud/qa';
 export { BASE_URL }; // 导出 BASE_URL 供外部使用
 
 
@@ -69,7 +69,7 @@ export async function sendChatMessageStream(
     return { abort: () => { } }; // 终止后续处理
   }
   try {
-    const response = await fetch(`${BASE_URL}/chat-messages`, {
+    const response = await fetch(`${BASE_URL}/ai/chat-messages`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -205,7 +205,7 @@ export async function sendChatMessageBlocking(
     // 确保 response_mode 为 blocking
     const requestData = { ...data, response_mode: 'blocking' };
     const response: AxiosResponse<ChatCompletionResponse> = await requests.post(
-      '/chat-messages',
+      '/ai/chat-messages',
       requestData
     );
     return response.data;
@@ -228,7 +228,7 @@ export async function uploadFile(file: File, user: string): Promise<FileUploadRe
 
   try {
     const response: AxiosResponse<FileUploadResponse> = await requests.post(
-      '/files/upload',
+      '/ai/files/upload',
       formData,
       {
         // axios 会自动为 FormData 设置正确的 Content-Type，但如果需要明确指定也可以
@@ -254,7 +254,7 @@ export async function stopResponse(
 ): Promise<{ result: string }> {
   try {
     const response: AxiosResponse<{ result: string }> = await requests.post(
-      `/chat-messages/${task_id}/stop`, // 使用模板字符串构建 URL
+      `/ai/chat-messages/${task_id}/stop`, // 使用模板字符串构建 URL
       { user } // 请求体包含 user
     );
     return response.data;
@@ -276,7 +276,7 @@ export async function sendFeedback(
 ): Promise<{ result: string }> {
   try {
     const response: AxiosResponse<{ result: string }> = await requests.post(
-      `/messages/${message_id}/feedbacks`,
+      `/ai/messages/${message_id}/feedbacks`,
       data
     );
     return response.data;
@@ -298,7 +298,7 @@ export async function getSuggestedQuestions(
 ): Promise<SuggestedQuestionsResponse> { // 使用定义的接口
   try {
     const response: AxiosResponse<SuggestedQuestionsResponse> = await requests.get(
-      `/messages/${message_id}/suggested`,
+      `/ai/messages/${message_id}/suggested`,
       { params: { user } } // 将 user 作为查询参数
     );
     return response.data;
@@ -327,7 +327,7 @@ export async function getMessages(
     if (first_id) params.first_id = first_id;
     if (limit) params.limit = limit;
 
-    const response: AxiosResponse<MessagesResponse> = await requests.get('/messages', { params });
+    const response: AxiosResponse<MessagesResponse> = await requests.get('/ai/messages', { params });
     return response.data;
   } catch (error) {
     console.error('获取历史消息失败:', error);
@@ -355,7 +355,7 @@ export async function getConversations(
     if (limit) params.limit = limit;
     if (sort_by) params.sort_by = sort_by;
 
-    const response: AxiosResponse<ConversationsResponse> = await requests.get('/conversations', { params });
+    const response: AxiosResponse<ConversationsResponse> = await requests.get('/ai/conversations', { params });
     return response.data;
   } catch (error) {
     console.error('获取会话列表失败:', error);
@@ -375,7 +375,7 @@ export async function deleteConversation(
 ): Promise<{ result: string }> {
   try {
     const response: AxiosResponse<{ result: string }> = await requests.delete(
-      `/conversations/${conversation_id}`,
+      `/ai/conversations/${conversation_id}`,
       // axios 的 delete 方法将请求体放在 data 属性中
       { data: { user } }
     );
@@ -398,7 +398,7 @@ export async function renameConversation(
 ): Promise<Conversation> { // 返回更具体的 Conversation 类型
   try {
     const response: AxiosResponse<Conversation> = await requests.post(
-      `/conversations/${conversation_id}/name`,
+      `/ai/conversations/${conversation_id}/name`,
       data
     );
     return response.data;
@@ -421,7 +421,7 @@ export async function audioToText(file: File, user: string): Promise<AudioToText
 
   try {
     const response: AxiosResponse<AudioToTextResponse> = await requests.post(
-      '/audio-to-text',
+      '/ai/audio-to-text',
       formData,
       { headers: { 'Content-Type': 'multipart/form-data' } }
     );
@@ -440,7 +440,7 @@ export async function audioToText(file: File, user: string): Promise<AudioToText
 export async function textToAudio(data: TextToAudioRequest): Promise<Blob> { // 使用定义的接口
   try {
     // responseType: 'blob' 告诉 axios 期望接收二进制数据
-    const response: AxiosResponse<Blob> = await requests.post('/text-to-audio', data, {
+    const response: AxiosResponse<Blob> = await requests.post('/ai/text-to-audio', data, {
       responseType: 'blob',
     });
     return response.data;
@@ -456,7 +456,7 @@ export async function textToAudio(data: TextToAudioRequest): Promise<Blob> { // 
  */
 export async function getAppInfo(): Promise<AppInfoResponse> { // 使用定义的接口
   try {
-    const response: AxiosResponse<AppInfoResponse> = await requests.get('/info');
+    const response: AxiosResponse<AppInfoResponse> = await requests.get('/ai/info');
     return response.data;
   } catch (error) {
     console.error('获取应用信息失败:', error);
@@ -470,7 +470,7 @@ export async function getAppInfo(): Promise<AppInfoResponse> { // 使用定义�
  */
 export async function getAppParameters(): Promise<AppParametersResponse> { // 使用定义的接口
   try {
-    const response: AxiosResponse<AppParametersResponse> = await requests.get('/parameters');
+    const response: AxiosResponse<AppParametersResponse> = await requests.get('/ai/parameters');
     return response.data;
   } catch (error) {
     console.error('获取应用参数失败:', error);
@@ -484,10 +484,22 @@ export async function getAppParameters(): Promise<AppParametersResponse> { // �
  */
 export async function getAppMeta(): Promise<AppMetaResponse> { // 使用定义的接口
   try {
-    const response: AxiosResponse<AppMetaResponse> = await requests.get('/meta');
+    const response: AxiosResponse<AppMetaResponse> = await requests.get('/ai/meta');
     return response.data;
   } catch (error) {
     console.error('获取应用 Meta 信息失败:', error);
+    throw error;
+  }
+}
+
+export async function getRecommendedQuestions(): Promise<any> {
+  try {
+    const response: AxiosResponse<any> = await requests.get(
+      '/public/categories',
+    );
+    return response.data;
+  } catch (error) {
+    console.error('获取推荐问题失败:', error);
     throw error;
   }
 }

@@ -30,10 +30,10 @@
   import ChatMessages from '@/components/ChatMessages.vue';
   import ChatInput from '@/components/ChatInput.vue';
   import WelcomePanel from '@/components/WelcomePanel.vue';
-  import { sendChatMessageStream, uploadFile } from '@/api'; // 假设 api 文件路径正确
-  // 引入需要的类型，确保路径正确
-  import type { ChunkChatCompletionResponse, ChatMessageRequest, RequestFile, FileUploadResponse } from '@/api/types'; // 假设 api 文件路径正确
-  import type { Message } from '@/types/ChatMessageType.ts'; // 假设 types 文件路径正确
+  import { sendChatMessageStream, uploadFile } from '@/api'; 
+
+  import type { ChunkChatCompletionResponse, ChatMessageRequest, RequestFile, FileUploadResponse } from '@/api/types';
+  import type { Message } from '@/types/ChatMessageType.ts'; 
   import { ElMessage } from 'element-plus';
 
   // --- 状态 ---
