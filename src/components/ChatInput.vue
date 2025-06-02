@@ -2,14 +2,16 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { ElInput, ElButton, ElIcon, ElMessage, ElTooltip } from 'element-plus';
-import { Paperclip, Mic, Close, Promotion } from '@element-plus/icons-vue';
+import { Paperclip, Mic, Close, Promotion, SwitchButton } from '@element-plus/icons-vue';
 
 const props = defineProps<{
-  disabled: boolean; 
+  disabled: boolean;
+  isLoading: boolean; // 新增：是否正在加载（AI回复中）
 }>();
 
 const emits = defineEmits<{
   (e: 'send-message', payload: { query: string; files: File[] }): void;
+  (e: 'stop-message'): void; // 新增：停止消息事件
 }>();
 
 // --- State ---
@@ -27,6 +29,11 @@ const handleSend = () => {
     inputValue.value = '';
     clearSelectedFiles();
   }
+};
+
+// 新增：停止消息处理函数
+const handleStop = () => {
+  emits('stop-message');
 };
 
 const triggerFileUpload = () => {
@@ -139,8 +146,9 @@ const handleVoiceInput = () => {
             />
                 <!-- Text "语音" removed to fit better as an icon button -->
         </ElTooltip>
-         <!-- Send Button - Styled like voice button -->
+         <!-- Send/Stop Button - 根据加载状态切换 -->
         <ElButton
+            v-if="!props.isLoading"
             round
             type="primary"
             @click="handleSend"
@@ -149,6 +157,16 @@ const handleVoiceInput = () => {
             :icon="Promotion"
         >
             发送
+        </ElButton>
+        <ElButton
+            v-else
+            round
+            type="danger"
+            @click="handleStop"
+            class="stop-styled-btn"
+            :icon="SwitchButton"
+        >
+            停止
         </ElButton>
       </div>
     </div>
@@ -288,6 +306,23 @@ const handleVoiceInput = () => {
    opacity: 0.7;
 }
 .send-styled-btn .el-icon {
+    margin-right: 4px; /* Space between icon and text */
+    font-size: 16px;
+}
+
+/* Stop Button Style */
+.stop-styled-btn {
+  background-color: #ef4444 !important; /* Red background */
+  color: #ffffff !important; /* White text/icon */
+  border: none !important;
+  height: 36px;
+  padding: 0 15px; /* Padding for text */
+  font-weight: 500;
+}
+.stop-styled-btn:hover {
+  background-color: #dc2626 !important;
+}
+.stop-styled-btn .el-icon {
     margin-right: 4px; /* Space between icon and text */
     font-size: 16px;
 }

@@ -14,7 +14,13 @@
 
     <!-- 固定在底部的聊天输入框 -->
     <div class="fixed-bottom">
-      <ChatInput class="chat-input-area" @send-message="handleSendMessage" :disabled="isUploading || isLoading" />
+      <ChatInput 
+        class="chat-input-area" 
+        @send-message="handleSendMessage" 
+        @stop-message="handleStopMessage"
+        :disabled="isUploading || isLoading" 
+        :is-loading="isLoading"
+      />
       <div class="disclaimer">
         成都金牛高新技术产业园区管委会提醒您。AI也会犯错,请核查重要信息。
       </div>
@@ -329,6 +335,29 @@
   const handleQuestionSelect = (questionText: string) => {
     // WelcomePanel 内部会在选择后自动收起，这里只需调用 handleSendMessage
     handleSendMessage({ query: questionText, files: [] });
+  };
+
+  // --- 停止消息处理 ---
+  const handleStopMessage = () => {
+    console.log('停止消息请求');
+    if (stopStreamHandler) {
+      stopStreamHandler.abort();
+      stopStreamHandler = null;
+    }
+    isLoading.value = false;
+    isUploading.value = false;
+    
+    // 更新最后一条消息的状态
+    if (messages.value.length > 0) {
+      const lastMessage = messages.value[messages.value.length - 1];
+      if (lastMessage.role === 'assistant' && lastMessage.isProcessing) {
+        lastMessage.isProcessing = false;
+        lastMessage.content += '\n\n[消息已停止]';
+        lastMessage.metadata = { ...lastMessage.metadata, stopped: true };
+      }
+    }
+    
+    ElMessage.info('已停止消息生成');
   };
 
   // --- 生命周期 ---

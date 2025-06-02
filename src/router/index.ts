@@ -2,6 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ChatView from '@/views/ChatView.vue'
 import LoginView from '@/views/LoginView.vue'
+import { resetLoginRetryCount } from '@/utils/auth'
 
 const routes = [
   {
@@ -44,6 +45,8 @@ router.beforeEach((to, _from, next) => {
     if (token) {
       console.log('Token found in hash, saving to localStorage.');
       localStorage.setItem('jwt_token', token);
+      // 登录成功，重置重试计数
+      resetLoginRetryCount();
       // 清理 sessionStorage (仍然是好习惯)
       sessionStorage.removeItem('redirectPath');
       // 清理 URL 中的 hash，让地址栏更干净 (可选但推荐)

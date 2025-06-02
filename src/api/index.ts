@@ -1,12 +1,14 @@
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
 import type { AppInfoResponse, AppMetaResponse, AppParametersResponse, AudioToTextResponse, ChatCompletionResponse, ChatMessageRequest, ChunkChatCompletionResponse, ChunkPing, Conversation, ConversationsResponse, FeedbackRequest, FileUploadResponse, MessagesResponse, RecommendedQuestionsResponse, RenameConversationRequest, SuggestedQuestionsResponse, TextToAudioRequest } from './types';
+import { handleLoginRedirect } from '@/utils/auth';
 
 
 // --- API 配置 ---
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://admin.visionblue.cloud/api';
 export { BASE_URL }; // 导出 BASE_URL 供外部使用
 
+// 导入认证工具函数
 
 function getToken(): string | null {
   return localStorage.getItem('jwt_token');
@@ -40,9 +42,7 @@ requests.interceptors.response.use(
   response => response,
   error => {
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
-      localStorage.removeItem('jwt_token');
-      // 重定向到登录页面
-      window.location.href = '/login';
+      handleLoginRedirect('Axios 响应拦截器检测到认证错误');
       // 返回一个 pending 的 Promise，阻止后续错误处理
       return new Promise(() => { });
     }
@@ -69,7 +69,7 @@ export async function sendChatMessageStream(
     return { abort: () => { } }; // 终止后续处理
   }
   try {
-    const response = await fetch(`${BASE_URL}/ai/chat-messages`, {
+    const response = await fetch(`${BASE_URL}/qa/ai/chat-messages`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -82,7 +82,7 @@ export async function sendChatMessageStream(
     // 检查 HTTP 状态码
     if (!response.ok) {
       if (response.status === 401 || response.status === 403) {
-        window.location.href = '/wechat/base/login'
+        handleLoginRedirect('sendChatMessageStream 检测到认证错误');
         return { abort: () => { } }; // 终止后续处理
       }
       // 尝试解析错误响应体
@@ -205,7 +205,7 @@ export async function sendChatMessageBlocking(
     // 确保 response_mode 为 blocking
     const requestData = { ...data, response_mode: 'blocking' };
     const response: AxiosResponse<ChatCompletionResponse> = await requests.post(
-      '/ai/chat-messages',
+      '/qa/ai/chat-messages',
       requestData
     );
     return response.data;
@@ -499,7 +499,7 @@ export async function getAppMeta(): Promise<AppMetaResponse> { // 使用定义�
 export async function getRecommendedQuestions(): Promise<RecommendedQuestionsResponse> {
   try {
     const response: AxiosResponse<RecommendedQuestionsResponse> = await requests.get(
-      '/public/categories',
+      '/qa/public/categories',
     );
     return response.data;
   } catch (error) {
