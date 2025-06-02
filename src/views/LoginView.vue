@@ -5,7 +5,7 @@
             <!-- 可选：添加一个加载指示器 -->
             <div class="loader" v-if="!redirectTimedOut"></div>
             <p v-if="redirectTimedOut" class="error-message">
-                跳转似乎遇到了问题。请检查您的网络连接，或尝试刷新页面。如果问题持续存在，请确保您在微信内部打开此链接。
+                授权跳转似乎遇到了问题。请检查您的网络连接，或尝试刷新页面重新登录。
             </p>
         </div>
         <p v-else class="error-message">请在微信浏览器内访问</p>
@@ -14,9 +14,6 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-
-const APPID = import.meta.env.VITE_WECHAT_APPID as string;
-const REDIRECT_URI = import.meta.env.VITE_WECHAT_REDIRECT_URI as string;
 
 const isWeChat = ref(false);
 const redirectTimedOut = ref(false); // 新增：跟踪跳转是否超时
@@ -34,33 +31,29 @@ onMounted(() => {
         redirectTimer = null;
     }
 
-    if (!APPID || !REDIRECT_URI) {
-        console.error("错误：未配置微信 APPID 或 REDIRECT_URI 环境变量！");
-        isWeChat.value = false;
-        // 可以在模板中显示更具体的配置错误信息
-        return;
-    }
-
     if (isWechatBrowser()) {
         isWeChat.value = true;
         redirectTimedOut.value = false; // 重置超时状态
-        const originalPath = sessionStorage.getItem('redirectPath') || '/'; 
-        const stateData = JSON.stringify({ redirect: originalPath });
-        const encodedState = encodeURIComponent(stateData);
-        const authUrl = `https://open.weixin.qq.com/connect/oauth2/authorize?appid=${APPID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=snsapi_base&state=${encodedState}#wechat_redirect`;
+        
+        // 获取当前路径作为重定向目标
+        const originalPath = sessionStorage.getItem('redirectPath') || window.location.pathname || '/';
+        
+        // 构造后端登录URL
+        const backendBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+        const loginUrl = `${backendBaseUrl}/wechat/auth/base/login?redirect=${encodeURIComponent(originalPath)}`;
 
-        console.log('Redirecting to WeChat OAuth:', authUrl);
+        console.log('Redirecting to backend login:', loginUrl);
 
         // 设置超时定时器 (例如 5 秒)
         redirectTimer = window.setTimeout(() => {
-            console.warn('WeChat redirection timed out.');
+            console.warn('Backend login redirection timed out.');
             redirectTimedOut.value = true; // 标记为超时
             // 此时用户仍在当前页面，显示超时错误信息
         }, 5000); // 5000 毫秒 = 5 秒
 
-        // 尝试执行跳转
+        // 尝试执行跳转到后端登录端点
         try {
-            window.location.href = authUrl;
+            window.location.href = loginUrl;
             // 如果跳转立即成功或即将开始，定时器将在页面卸载时自动清理，
             // 或者如果跳转被浏览器阻止，定时器会触发。
         } catch (error) {

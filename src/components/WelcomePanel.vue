@@ -78,13 +78,13 @@ import {
   ArrowRight, ArrowDown, ArrowUp, // 使用 ArrowDown 和 ArrowUp 作为切换图标
   ChatDotRound, Document, OfficeBuilding, Calendar, Service, QuestionFilled
 } from '@element-plus/icons-vue';
-import { getRecommendedQuestions } from '@/api'; // 假设有一个 API 函数获取推荐问题
+import { getRecommendedQuestions } from '@/api'; // 导入 API 函数获取推荐问题
 
 // 图标映射
 const icons: Record<string, any> = { Document, OfficeBuilding, Calendar, Service, QuestionFilled, ChatDotRound };
 
 // --- 类型定义 ---
-interface SubQuestion { text: string; query?: string; }
+interface SubQuestion { text: string; query?: string | null; }
 interface QuestionCategory { title: string; icon?: string; description?: string; questions: SubQuestion[]; }
 
 // --- Props ---
@@ -127,77 +127,20 @@ const togglePanel = () => {
   }
 };
 
-// 模拟 API 请求获取推荐问题
-const fetchRecommendedQuestions = async (): Promise<QuestionCategory[]> => {
-
-  await new Promise(resolve => setTimeout(resolve, 600));
-  return [
-    {
-      "title": "金牛区惠企政策查询",
-      "icon": "Document",
-      "questions": [
-        { "text": "小微企业有哪些融资政策和渠道" },
-        { "text": "医药健康企业在药品或医疗器械研发的不同阶段能获得哪些资金支持？" },
-        { "text": "引进品牌首店或举办大型文体旅/赛事演艺活动，金牛区有哪些支持政策？" },
-        { "text": "针对老旧电梯、汽车或住房‘以旧换新’，以及企业设备更新，有哪些专项补贴？" }
-      ]
-    },
-    {
-      title: "企业注册及变更服务", icon: "OfficeBuilding", questions: [
-        { text: "新公司注册入驻园区需要准备哪些材料？" },
-        { text: "公司名称变更需要准备哪些材料？" },
-        { text: "公司地址变更需要准备哪些材料？" },
-        { text: "公司法人变更需要准备哪些材料？" },
-        { text: "公司股权股东变更需要准备哪些材料？" },
-        { text: "公司经营范围变更需要准备哪些材料？" },
-        { text: "公司注册资金变更需要准备哪些材料？" }
-      ]
-    },
-    {
-      "title": "金牛区企业供给能力查询",
-      "icon": "OfficeBuilding",
-      "questions": [
-        { "text": "介绍一下园区内如何开通宽带？" },
-        { "text": "金牛区有哪些企业提供轨道交通相关的设备或材料？" },
-        { "text": "我想了解下有哪些公司在做医药健康相关的业务？？" },
-        { "text": "请推荐金牛区可以承接水利水电或市政公用工程的建筑公司。" },
-        { "text": "金牛区有哪些主要的汽车销售服务公司，它们代理什么品牌？" }
-      ]
-    },
-    {
-      title: "产业载体投资机会", icon: "Service", questions: [
-        { text: "金牛区有哪些工业科创类产业载体？" },
-        { text: "'Ai数字创智元' 这个载体的的具体信息" },
-        { text: "哪些产业载体正在招引人工智能（AI） 相关的企业" },
-        { text: "适合设立总部的商贸类写字楼项目，有什么推荐？" }
-      ]
-    },
-    {
-      "title": "企业注册信息查询",
-      "icon": "OfficeBuilding",
-      "questions": [
-        { "text": "查询 '四川水井坊股份有限公司' 的法人和注册地址？" },
-        { "text": "有哪些公司在做医药健康相关的业务？" },
-        { "text": "查询金牛区有多少家 '高新技术企业'？" },
-        { "text": "查询10家经营范围包含 '人工智能' 的公司？" }
-      ]
-    }
-  ];
-};
-
 // --- 生命周期与监听 ---
 onMounted(async () => {
   loading.value = true;
   try {
-    // categories.value = await fetchRecommendedQuestions();
-    const res= await getRecommendedQuestions();
+    const res = await getRecommendedQuestions();
     categories.value = res.data;
   } catch (error) {
     console.error('获取推荐问题失败:', error);
     categories.value = [{
-      title: "常见问题", icon: "QuestionFilled", questions: [
-        { text: "园区主要有哪些产业方向？" },
-        { text: "如何联系园区管委会相关部门？" }
+      title: "常见问题", 
+      icon: "QuestionFilled", 
+      questions: [
+        { text: "园区主要有哪些产业方向？", query: null },
+        { text: "如何联系园区管委会相关部门？", query: null }
       ]
     }];
   } finally {

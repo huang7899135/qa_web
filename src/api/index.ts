@@ -1,11 +1,10 @@
 import axios from 'axios';
 import type { AxiosResponse } from 'axios';
-import type { AppInfoResponse, AppMetaResponse, AppParametersResponse, AudioToTextResponse, ChatCompletionResponse, ChatMessageRequest, ChunkChatCompletionResponse, ChunkPing, Conversation, ConversationsResponse, FeedbackRequest, FileUploadResponse, MessagesResponse, RenameConversationRequest, SuggestedQuestionsResponse, TextToAudioRequest } from './types';
+import type { AppInfoResponse, AppMetaResponse, AppParametersResponse, AudioToTextResponse, ChatCompletionResponse, ChatMessageRequest, ChunkChatCompletionResponse, ChunkPing, Conversation, ConversationsResponse, FeedbackRequest, FileUploadResponse, MessagesResponse, RecommendedQuestionsResponse, RenameConversationRequest, SuggestedQuestionsResponse, TextToAudioRequest } from './types';
 
 
-const BACKEND_AUTH_URL = ""
 // --- API 配置 ---
-const BASE_URL = 'http://visionblue.cloud/qa';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://admin.visionblue.cloud/api';
 export { BASE_URL }; // 导出 BASE_URL 供外部使用
 
 
@@ -42,7 +41,8 @@ requests.interceptors.response.use(
   error => {
     if (error.response && (error.response.status === 401 || error.response.status === 403)) {
       localStorage.removeItem('jwt_token');
-      window.location.href = BACKEND_AUTH_URL; // 重定向到登录页面
+      // 重定向到登录页面
+      window.location.href = '/login';
       // 返回一个 pending 的 Promise，阻止后续错误处理
       return new Promise(() => { });
     }
@@ -492,9 +492,13 @@ export async function getAppMeta(): Promise<AppMetaResponse> { // 使用定义�
   }
 }
 
-export async function getRecommendedQuestions(): Promise<any> {
+/**
+ * 获取推荐问题分类列表
+ * @returns 返回推荐问题分类列表
+ */
+export async function getRecommendedQuestions(): Promise<RecommendedQuestionsResponse> {
   try {
-    const response: AxiosResponse<any> = await requests.get(
+    const response: AxiosResponse<RecommendedQuestionsResponse> = await requests.get(
       '/public/categories',
     );
     return response.data;

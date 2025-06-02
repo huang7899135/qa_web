@@ -307,6 +307,33 @@ export interface RequestFile {
     result: string; // 固定 "success"
     data: string[]; // 问题列表
   }
+
+  /**
+   * 推荐问题子问题接口
+   */
+  export interface RecommendedSubQuestion {
+    text: string; // 问题文本
+    query?: string | null; // 查询语句 (可选)
+  }
+
+  /**
+   * 推荐问题分类接口
+   */
+  export interface RecommendedQuestionCategory {
+    title: string; // 分类标题
+    icon?: string; // 图标名称 (可选)
+    description?: string; // 分类描述 (可选)
+    questions: RecommendedSubQuestion[]; // 问题列表
+  }
+
+  /**
+   * 推荐问题响应接口
+   */
+  export interface RecommendedQuestionsResponse {
+    code: number; // 状态码
+    message: string; // 响应消息
+    data: RecommendedQuestionCategory[]; // 推荐问题分类列表
+  }
   
   /**
    * 历史消息项接口 (简化版，可根据需要扩展)

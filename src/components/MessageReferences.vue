@@ -53,9 +53,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive, shallowRef, type Component } from 'vue'; // 引入 shallowRef 和 Component
-import { ElDrawer, ElButton, ElIcon, ElTooltip, ElMessage } from 'element-plus';
-import { Link, Download, CopyDocument } from '@element-plus/icons-vue';
+import { ref, computed, reactive, type Component } from 'vue'; // 引入 shallowRef 和 Component
+import { ElDrawer, ElButton, ElIcon, ElTooltip } from 'element-plus';
+import { Download, CopyDocument } from '@element-plus/icons-vue';
 import { copyToClipboard } from '@/utils/clipboard.ts';
 // 引入所有需要的图标组件
 import GenericFileIcon from './icons/GenericFileIcon.vue';
@@ -66,7 +66,7 @@ import MarkdownIcon from './icons/MarkdownIcon.vue';
 // --- 新增：引入 WebLinkIcon ---
 import WebLinkIcon from './icons/WebLinkIcon.vue';
 import type { MessageMetadata } from '@/types/ChatMessageType';
-import type { RetrieverResource } from '@/api';
+// import type { RetrieverResource } from '@/api';
 
 const props = defineProps<{
     metadata?: MessageMetadata | null;
