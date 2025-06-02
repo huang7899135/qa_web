@@ -37,7 +37,7 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   // 1. 检查 URL hash 是否包含 jwt_token
   if (to.hash.startsWith('#jwt_token=')) {
     const token = to.hash.substring('#jwt_token='.length);
