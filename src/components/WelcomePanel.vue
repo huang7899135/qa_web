@@ -74,14 +74,12 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { ElIcon, ElTooltip } from 'element-plus';
-import {
-  ArrowRight, ArrowDown, ArrowUp, // 使用 ArrowDown 和 ArrowUp 作为切换图标
-  ChatDotRound, Document, OfficeBuilding, Calendar, Service, QuestionFilled
-} from '@element-plus/icons-vue';
+import * as ElementPlusIconsVue from '@element-plus/icons-vue';
+import { ArrowDown, ArrowUp, ArrowRight } from '@element-plus/icons-vue';
 import { getRecommendedQuestions } from '@/api'; // 导入 API 函数获取推荐问题
 
 // 图标映射
-const icons: Record<string, any> = { Document, OfficeBuilding, Calendar, Service, QuestionFilled, ChatDotRound };
+const icons: Record<string, any> = ElementPlusIconsVue;
 
 // --- 类型定义 ---
 interface SubQuestion { text: string; query?: string | null; }
