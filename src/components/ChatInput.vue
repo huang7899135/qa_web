@@ -311,7 +311,17 @@ const handleVoiceInput = () => {
 .morphing-btn.is-loading {
   width: 36px !important;
   padding: 0 !important;
+  pointer-events: auto !important; /* Ensure clickable when in stop mode */
 }
+
+/* Ensure the button itself does not get disabled by parent when it's in stop mode */
+.morphing-btn.is-loading[disabled], .morphing-btn.is-loading.is-disabled {
+  background-color: #1f2937 !important; /* Keep active background */
+  opacity: 1 !important; /* Keep active opacity */
+  pointer-events: auto !important; /* Explicitly enable pointer events */
+  cursor: pointer !important; /* Show pointer cursor */
+}
+
 
 /* 发送状态：较长按钮 */
 .morphing-btn:not(.is-loading) {
@@ -319,13 +329,20 @@ const handleVoiceInput = () => {
   padding: 0 15px !important;
 }
 
-.morphing-btn:hover {
+/* .morphing-btn:hover { */
+.morphing-btn:hover:not(.is-loading) {
   background-color: #374151 !important;
 }
 
-.morphing-btn[disabled] {
+/* .morphing-btn[disabled] {
    background-color: #9ca3af !important;
    opacity: 0.7;
+} */
+.morphing-btn:not(.is-loading)[disabled], .morphing-btn:not(.is-loading).is-disabled {
+   background-color: #9ca3af !important;
+   opacity: 0.7;
+   pointer-events: none; /* Standard disabled behavior */
+   cursor: not-allowed;
 }
 
 /* 图标和文字的淡入淡出动画 */
