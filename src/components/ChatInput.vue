@@ -2,7 +2,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { ElInput, ElButton, ElIcon, ElMessage, ElTooltip } from 'element-plus';
-import { Paperclip, Mic, Close, Promotion, SwitchButton } from '@element-plus/icons-vue';
+import { Paperclip, Mic, Close, Promotion } from '@element-plus/icons-vue';
+import StopIcon from '@/components/icons/StopIcon.vue';
 
 const props = defineProps<{
   disabled: boolean;
@@ -146,27 +147,28 @@ const handleVoiceInput = () => {
             />
                 <!-- Text "语音" removed to fit better as an icon button -->
         </ElTooltip>
-         <!-- Send/Stop Button - 根据加载状态切换 -->
+         <!-- Send/Stop Button - 单个按钮形状变换动画 -->
         <ElButton
-            v-if="!props.isLoading"
             round
             type="primary"
-            @click="handleSend"
-            :disabled="props.disabled || (!inputValue.trim() && selectedFiles.length === 0)"
-            class="send-styled-btn"
-            :icon="Promotion"
+            @click="props.isLoading ? handleStop() : handleSend()"
+            :disabled="props.isLoading ? false : (props.disabled || (!inputValue.trim() && selectedFiles.length === 0))"
+            :class="[
+              'morphing-btn',
+              { 'is-loading': props.isLoading }
+            ]"
         >
-            发送
-        </ElButton>
-        <ElButton
-            v-else
-            round
-            type="danger"
-            @click="handleStop"
-            class="stop-styled-btn"
-            :icon="SwitchButton"
-        >
-            停止
+            <transition name="icon-fade" mode="out-in">
+              <template v-if="!props.isLoading">
+                <el-icon key="send"><Promotion /></el-icon>
+              </template>
+              <template v-else>
+                <el-icon key="stop"><StopIcon :size="14" /></el-icon>
+              </template>
+            </transition>
+            <transition name="text-fade" mode="out-in">
+              <span v-if="!props.isLoading" key="send-text" class="btn-text">发送</span>
+            </transition>
         </ElButton>
       </div>
     </div>
@@ -289,42 +291,70 @@ const handleVoiceInput = () => {
     font-size: 18px; /* Adjust icon size */
 }
 
-/* Send Button Style (similar to voice) */
-.send-styled-btn {
-  background-color: #1f2937 !important; /* Dark background */
-  color: #ffffff !important; /* White text/icon */
+/* Morphing Button Style - 形状变换按钮 */
+.morphing-btn {
+  background-color: #1f2937 !important;
+  color: #ffffff !important;
   border: none !important;
-  height: 36px;
-  padding: 0 15px; /* Padding for text */
+  height: 36px !important;
+  min-width: 36px !important; /* 最小宽度为圆形 */
+  padding: 0 !important;
   font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
 }
-.send-styled-btn:hover {
+
+/* 停止状态：圆形按钮 */
+.morphing-btn.is-loading {
+  width: 36px !important;
+  padding: 0 !important;
+}
+
+/* 发送状态：较长按钮 */
+.morphing-btn:not(.is-loading) {
+  width: auto !important;
+  padding: 0 15px !important;
+}
+
+.morphing-btn:hover {
   background-color: #374151 !important;
 }
-.send-styled-btn[disabled] {
+
+.morphing-btn[disabled] {
    background-color: #9ca3af !important;
    opacity: 0.7;
 }
-.send-styled-btn .el-icon {
-    margin-right: 4px; /* Space between icon and text */
-    font-size: 16px;
+
+/* 图标和文字的淡入淡出动画 */
+.icon-fade-enter-active,
+.icon-fade-leave-active,
+.text-fade-enter-active,
+.text-fade-leave-active {
+  transition: all 0.2s ease-in-out;
 }
 
-/* Stop Button Style */
-.stop-styled-btn {
-  background-color: #ef4444 !important; /* Red background */
-  color: #ffffff !important; /* White text/icon */
-  border: none !important;
-  height: 36px;
-  padding: 0 15px; /* Padding for text */
-  font-weight: 500;
+.icon-fade-enter-from,
+.icon-fade-leave-to,
+.text-fade-enter-from,
+.text-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.8);
 }
-.stop-styled-btn:hover {
-  background-color: #dc2626 !important;
+
+.icon-fade-enter-to,
+.icon-fade-leave-from,
+.text-fade-enter-to,
+.text-fade-leave-from {
+  opacity: 1;
+  transform: scale(1);
 }
-.stop-styled-btn .el-icon {
-    margin-right: 4px; /* Space between icon and text */
-    font-size: 16px;
+
+.btn-text {
+  margin-left: 4px;
+  white-space: nowrap;
 }
 
 </style>
