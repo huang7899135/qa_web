@@ -184,10 +184,11 @@ const copySingleFileLink = async (templateName: string) => {
 // --- 获取模板下载链接的后端 API 调用函数 (保持不变) ---
 async function fetchTemplateDownloadLink(templateNames: string[]): Promise<string | null> {
     // console.log("准备调用后端 API 生成模板下载链接，模板文件:", templateNames);
+    // TODO：后期增加一个 api 接口，方便管理段直接对文件下载提供修改
     // -------- 模拟 API 调用 --------
     return new Promise((resolve) => {
         setTimeout(() => {
-            const simulatedLink = `http://nas.visionblue.cloud:8090/documents/template/${encodeURIComponent(templateNames[0])}`;
+            const simulatedLink = `http://qa.visionblue.cloud/files/${encodeURIComponent(templateNames[0])}`;
             // console.log("模拟生成模板下载链接:", simulatedLink);
             resolve(simulatedLink);
         }, 100); // 模拟网络延迟
