@@ -132,7 +132,7 @@ onMounted(async () => {
     const res = await getRecommendedQuestions();
     categories.value = res.data;
   } catch (error) {
-    console.error('获取推荐问题失败:', error);
+    // console.error('获取推荐问题失败:', error);
     categories.value = [{
       title: "常见问题", 
       icon: "QuestionFilled", 

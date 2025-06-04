@@ -13,10 +13,10 @@ let retryResetTimer: number | null = null;
  * @param reason 触发登录的原因（可选）
  * @returns 是否成功处理重定向
  */
-export function handleLoginRedirect(reason?: string): boolean {
+export function handleLoginRedirect(_reason?: string): boolean {
   // 检查重试次数
   if (loginRetryCount >= MAX_LOGIN_RETRIES) {
-    console.error(`登录重试次数已达到上限 (${MAX_LOGIN_RETRIES})，停止重试`);
+    // console.error(`登录重试次数已达到上限 (${MAX_LOGIN_RETRIES})，停止重试`);
     
     // 显示错误提示给用户
     if (typeof window !== 'undefined') {
@@ -30,7 +30,7 @@ export function handleLoginRedirect(reason?: string): boolean {
 
   // 增加重试计数
   loginRetryCount++;
-  console.log(`执行登录重定向 (第 ${loginRetryCount} 次)${reason ? `，原因: ${reason}` : ''}`);
+  // console.log(`执行登录重定向 (第 ${loginRetryCount} 次)${reason ? `，原因: ${reason}` : ''}`);
 
   // 清理现有的 token
   localStorage.removeItem('jwt_token');
@@ -45,7 +45,7 @@ export function handleLoginRedirect(reason?: string): boolean {
     clearTimeout(retryResetTimer);
   }
   retryResetTimer = window.setTimeout(() => {
-    console.log('重置登录重试计数');
+    // console.log('重置登录重试计数');
     loginRetryCount = 0;
     retryResetTimer = null;
   }, RETRY_RESET_INTERVAL);
@@ -57,7 +57,7 @@ export function handleLoginRedirect(reason?: string): boolean {
     }
     return true;
   } catch (error) {
-    console.error('登录重定向失败:', error);
+    // console.error('登录重定向失败:', error);
     return false;
   }
 }
@@ -71,7 +71,7 @@ export function resetLoginRetryCount(): void {
     clearTimeout(retryResetTimer);
     retryResetTimer = null;
   }
-  console.log('登录重试计数已重置');
+  // console.log('登录重试计数已重置');
 }
 
 /**

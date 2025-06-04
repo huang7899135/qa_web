@@ -121,7 +121,7 @@ export async function sendChatMessageStream(
                     const chunk = JSON.parse(jsonStr) as ChunkChatCompletionResponse;
                     onMessage(chunk);
                   } catch (e) {
-                    console.error('解析流式块失败 (EOF):', jsonStr, e);
+                    // console.error('解析流式块失败 (EOF):', jsonStr, e);
                     // 可以在这里调用 onError，或者根据需要忽略解析错误
                     // onError(new Error(`解析流式块失败 (EOF): ${e.message}`));
                   }
@@ -150,7 +150,7 @@ export async function sendChatMessageStream(
                 const chunk = JSON.parse(jsonStr) as ChunkChatCompletionResponse;
                 onMessage(chunk); // 调用回调函数处理块
               } catch (e) {
-                console.error('解析流式块失败:', jsonStr, e);
+                // console.error('解析流式块失败:', jsonStr, e);
                 // 可以在这里决定是否调用 onError
                 // onError(new Error(`解析流式块失败: ${e.message}`));
               }
@@ -210,7 +210,7 @@ export async function sendChatMessageBlocking(
     );
     return response.data;
   } catch (error) {
-    console.error('发送对话消息(阻塞模式)失败:', error);
+    // console.error('发送对话消息(阻塞模式)失败:', error);
     throw error; // 重新抛出错误，让调用者处理
   }
 }
@@ -237,7 +237,7 @@ export async function uploadFile(file: File, user: string): Promise<FileUploadRe
     );
     return response.data;
   } catch (error) {
-    console.error('上传文件失败:', error);
+    // console.error('上传文件失败:', error);
     throw error;
   }
 }
@@ -259,7 +259,7 @@ export async function stopResponse(
     );
     return response.data;
   } catch (error) {
-    console.error('停止响应失败:', error);
+    // console.error('停止响应失败:', error);
     throw error;
   }
 }
@@ -281,7 +281,7 @@ export async function sendFeedback(
     );
     return response.data;
   } catch (error) {
-    console.error('发送反馈失败:', error);
+    // console.error('发送反馈失败:', error);
     throw error;
   }
 }
@@ -303,7 +303,7 @@ export async function getSuggestedQuestions(
     );
     return response.data;
   } catch (error) {
-    console.error('获取建议问题失败:', error);
+    // console.error('获取建议问题失败:', error);
     throw error;
   }
 }
@@ -330,7 +330,7 @@ export async function getMessages(
     const response: AxiosResponse<MessagesResponse> = await requests.get('/ai/messages', { params });
     return response.data;
   } catch (error) {
-    console.error('获取历史消息失败:', error);
+    // console.error('获取历史消息失败:', error);
     throw error;
   }
 }
@@ -358,7 +358,7 @@ export async function getConversations(
     const response: AxiosResponse<ConversationsResponse> = await requests.get('/ai/conversations', { params });
     return response.data;
   } catch (error) {
-    console.error('获取会话列表失败:', error);
+    // console.error('获取会话列表失败:', error);
     throw error;
   }
 }
@@ -381,7 +381,7 @@ export async function deleteConversation(
     );
     return response.data;
   } catch (error) {
-    console.error('删除会话失败:', error);
+    // console.error('删除会话失败:', error);
     throw error;
   }
 }
@@ -403,7 +403,7 @@ export async function renameConversation(
     );
     return response.data;
   } catch (error) {
-    console.error('重命名会话失败:', error);
+    // console.error('重命名会话失败:', error);
     throw error;
   }
 }
@@ -427,7 +427,7 @@ export async function audioToText(file: File, user: string): Promise<AudioToText
     );
     return response.data;
   } catch (error) {
-    console.error('语音转文字失败:', error);
+    // console.error('语音转文字失败:', error);
     throw error;
   }
 }
@@ -445,7 +445,7 @@ export async function textToAudio(data: TextToAudioRequest): Promise<Blob> { // 
     });
     return response.data;
   } catch (error) {
-    console.error('文字转语音失败:', error);
+    // console.error('文字转语音失败:', error);
     throw error;
   }
 }
@@ -459,7 +459,7 @@ export async function getAppInfo(): Promise<AppInfoResponse> { // 使用定义�
     const response: AxiosResponse<AppInfoResponse> = await requests.get('/ai/info');
     return response.data;
   } catch (error) {
-    console.error('获取应用信息失败:', error);
+    // console.error('获取应用信息失败:', error);
     throw error;
   }
 }
@@ -473,7 +473,7 @@ export async function getAppParameters(): Promise<AppParametersResponse> { // �
     const response: AxiosResponse<AppParametersResponse> = await requests.get('/ai/parameters');
     return response.data;
   } catch (error) {
-    console.error('获取应用参数失败:', error);
+    // console.error('获取应用参数失败:', error);
     throw error;
   }
 }
@@ -487,7 +487,7 @@ export async function getAppMeta(): Promise<AppMetaResponse> { // 使用定义�
     const response: AxiosResponse<AppMetaResponse> = await requests.get('/ai/meta');
     return response.data;
   } catch (error) {
-    console.error('获取应用 Meta 信息失败:', error);
+    // console.error('获取应用 Meta 信息失败:', error);
     throw error;
   }
 }
@@ -503,7 +503,7 @@ export async function getRecommendedQuestions(): Promise<RecommendedQuestionsRes
     );
     return response.data;
   } catch (error) {
-    console.error('获取推荐问题失败:', error);
+    // console.error('获取推荐问题失败:', error);
     throw error;
   }
 }

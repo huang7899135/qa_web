@@ -91,7 +91,7 @@
       const openMapUrl = (url: string) => {
         error.value = null; // 清除旧错误
         showTip.value = true; // 显示提示信息
-        console.log(`尝试打开地图 Universal/App Link: ${url}`);
+        // console.log(`尝试打开地图 Universal/App Link: ${url}`);
   
         try {
           // 使用 a 标签的 click 方法有时比直接设置 location.href 更可靠
@@ -109,7 +109,7 @@
           }, 2500);
   
         } catch (e: any) {
-          console.error("打开地图 URL 时出错:", e);
+          // console.error("打开地图 URL 时出错:", e);
           error.value = `尝试打开地图失败: ${e.message}. 请检查浏览器设置或权限。`;
           showTip.value = false; // 出错时隐藏提示
         }

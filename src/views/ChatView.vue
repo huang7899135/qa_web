@@ -278,7 +278,7 @@
           stopStreamHandler = null; // 确保在消息结束时重置 stopStreamHandler
           break;
         case 'error':
-          console.error('SSE 流错误:', chunk);
+          // console.error('SSE 流错误:', chunk);
           messages.value[index].content = `抱歉，处理时遇到问题: ${chunk.message || chunk.code || '未知错误'}`;
           messages.value[index].metadata = { ...messages.value[index].metadata, error: true };
           messages.value[index].isProcessing = false;
@@ -298,7 +298,7 @@
 
     // --- 处理 SSE 错误 ---
     const handleError = (error: any) => {
-      console.error('发送消息或处理流时发生错误:', error);
+      // console.error('发送消息或处理流时发生错误:', error);
       const lookupId = finalAssistantMessageId || assistantMessageTempId;
       const index = findMessageIndexById(lookupId);
       const errorMessage = `请求失败: ${error?.message || '网络连接错误或服务器无响应'}`;
@@ -326,11 +326,11 @@
     // --- 发起请求 ---
     try {
       // 调用 API 发送消息，传入请求体、处理函数和错误处理函数
-      console.log('开始发送流式消息请求');
+      // console.log('开始发送流式消息请求');
       stopStreamHandler = await sendChatMessageStream(request, processChunk, handleError);
-      console.log('流式消息请求已设置，stopStreamHandler:', stopStreamHandler);
+      // console.log('流式消息请求已设置，stopStreamHandler:', stopStreamHandler);
     } catch (error) {
-      console.error('发送流式消息请求时发生同步错误:', error);
+      // console.error('发送流式消息请求时发生同步错误:', error);
       stopStreamHandler = null; // 确保在同步错误时重置
       handleError(error); // 处理同步错误
     }
@@ -345,15 +345,15 @@
 
   // --- 停止消息处理 ---
   const handleStopMessage = () => {
-    console.log('停止消息请求，当前 stopStreamHandler:', stopStreamHandler);
-    console.log('当前 isLoading 状态:', isLoading.value);
+    // console.log('停止消息请求，当前 stopStreamHandler:', stopStreamHandler);
+    // console.log('当前 isLoading 状态:', isLoading.value);
     
     if (stopStreamHandler) {
-      console.log('执行 abort 操作');
+      // console.log('执行 abort 操作');
       stopStreamHandler.abort();
       stopStreamHandler = null;
     } else {
-      console.warn('stopStreamHandler 为空，无法停止流');
+      // console.warn('stopStreamHandler 为空，无法停止流');
     }
     
     isLoading.value = false;
@@ -362,12 +362,12 @@
     // 更新最后一条消息的状态
     if (messages.value.length > 0) {
       const lastMessage = messages.value[messages.value.length - 1];
-      console.log('最后一条消息:', lastMessage);
+      // console.log('最后一条消息:', lastMessage);
       if (lastMessage.role === 'assistant' && lastMessage.isProcessing) {
         lastMessage.isProcessing = false;
         lastMessage.content += '\n\n[消息已停止]';
         lastMessage.metadata = { ...lastMessage.metadata, stopped: true };
-        console.log('已更新最后一条消息状态');
+        // console.log('已更新最后一条消息状态');
       }
     }
     
@@ -376,7 +376,7 @@
 
   // --- 生命周期 ---
   onMounted(() => {
-    console.log("ChatWindow: Component mounted.");
+    // console.log("ChatWindow: Component mounted.");
     // 可以在这里加载历史消息等初始化操作
   });
 

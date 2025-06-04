@@ -43,7 +43,7 @@ router.beforeEach((to, _from, next) => {
   if (to.hash.startsWith('#jwt_token=')) {
     const token = to.hash.substring('#jwt_token='.length);
     if (token) {
-      console.log('Token found in hash, saving to localStorage.');
+      // console.log('Token found in hash, saving to localStorage.');
       localStorage.setItem('jwt_token', token);
       // 登录成功，重置重试计数
       resetLoginRetryCount();
@@ -67,7 +67,7 @@ router.beforeEach((to, _from, next) => {
 
   if (requiresAuth && !token) {
     // 3. 需要认证但无 token -> 重定向到前端登录页
-    console.log('No token found, redirecting to frontend login page...');
+    // console.log('No token found, redirecting to frontend login page...');
     // 保存用户尝试访问的完整路径 (包括查询参数和 hash，如果有的话)
     sessionStorage.setItem('redirectPath', to.fullPath);
     next({ name: 'Login' });
@@ -75,7 +75,7 @@ router.beforeEach((to, _from, next) => {
   }
 
   // 如果不需要认证，或者需要认证且已有 token，则放行
-  console.log(`Navigation allowed to ${to.path}`);
+  // console.log(`Navigation allowed to ${to.path}`);
   next();
 });
 

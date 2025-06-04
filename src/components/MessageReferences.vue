@@ -107,14 +107,14 @@ const templateFiles = computed((): string[] => {
 });
 
 const getIconForFile = (fileNameOrUrl: string): Component => {
-    console.log("获取文件图标，名称/URL:", fileNameOrUrl);
+    // console.log("获取文件图标，名称/URL:", fileNameOrUrl);
     if (!fileNameOrUrl) return GenericFileIcon;
 
     const lowerCaseName = fileNameOrUrl.toLowerCase();
 
     // 检查是否为 URL
     if (lowerCaseName.startsWith('http://') || lowerCaseName.startsWith('https://')) {
-        console.log("匹配到 Web 链接图标");
+        // console.log("匹配到 Web 链接图标");
         return WebLinkIcon;
     }
 
@@ -123,21 +123,21 @@ const getIconForFile = (fileNameOrUrl: string): Component => {
 
     switch (extension) {
         case 'pdf':
-            console.log("匹配到 PDF 文件图标");
+            // console.log("匹配到 PDF 文件图标");
             return PdfIcon;
         case 'doc':
         case 'docx':
-            console.log("匹配到 Word 文件图标");
+            // console.log("匹配到 Word 文件图标");
             return WordIcon;
         case 'xls':
         case 'xlsx':
-            console.log("匹配到 Excel 文件图标");
+            // console.log("匹配到 Excel 文件图标");
             return ExcelIcon;
         case 'md':
-            console.log("匹配到 Markdown 文件图标");
+            // console.log("匹配到 Markdown 文件图标");
             return MarkdownIcon;
         default:
-            console.log("未匹配到特定图标，使用通用文件图标");
+            // console.log("未匹配到特定图标，使用通用文件图标");
             return GenericFileIcon;
     }
 };
@@ -173,7 +173,7 @@ const copySingleFileLink = async (templateName: string) => {
             // ElMessage.error(`无法为 "${templateName}" 生成下载链接。`);
         }
     } catch (error) {
-        console.error(`生成模板 "${templateName}" 下载链接失败:`, error);
+        // console.error(`生成模板 "${templateName}" 下载链接失败:`, error);
         // ElMessage.error(`生成 "${templateName}" 下载链接时出错。`);
     } finally {
         loadingStates[templateName] = false;
@@ -183,12 +183,12 @@ const copySingleFileLink = async (templateName: string) => {
 
 // --- 获取模板下载链接的后端 API 调用函数 (保持不变) ---
 async function fetchTemplateDownloadLink(templateNames: string[]): Promise<string | null> {
-    console.log("准备调用后端 API 生成模板下载链接，模板文件:", templateNames);
+    // console.log("准备调用后端 API 生成模板下载链接，模板文件:", templateNames);
     // -------- 模拟 API 调用 --------
     return new Promise((resolve) => {
         setTimeout(() => {
             const simulatedLink = `http://nas.visionblue.cloud:8090/documents/template/${encodeURIComponent(templateNames[0])}`;
-            console.log("模拟生成模板下载链接:", simulatedLink);
+            // console.log("模拟生成模板下载链接:", simulatedLink);
             resolve(simulatedLink);
         }, 100); // 模拟网络延迟
     });

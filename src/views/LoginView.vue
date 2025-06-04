@@ -59,7 +59,7 @@ onMounted(() => {
         const backendBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
         const loginUrl = `${backendBaseUrl}/wechat/auth/base/login?redirect=${encodeURIComponent(originalPath)}`;
 
-        console.log('Redirecting to backend login:', loginUrl);
+        // console.log('Redirecting to backend login:', loginUrl);
 
         // 设置超时定时器 (例如 5 秒)
         redirectTimer = window.setTimeout(() => {
@@ -74,7 +74,7 @@ onMounted(() => {
             // 如果跳转立即成功或即将开始，定时器将在页面卸载时自动清理，
             // 或者如果跳转被浏览器阻止，定时器会触发。
         } catch (error) {
-            console.error('Failed to initiate redirection:', error);
+            // console.error('Failed to initiate redirection:', error);
             if (redirectTimer) clearTimeout(redirectTimer); // 出错时清除定时器
             redirectTimedOut.value = true; // 直接标记为失败
             isWeChat.value = true; // 保持显示微信环境下的错误信息
