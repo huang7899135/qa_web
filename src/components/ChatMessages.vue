@@ -15,17 +15,23 @@
                 加载指示器:
                 仅在消息正在处理中 (isProcessing=true) 且 内容完全为空 (content='') 时显示。
               -->
-              <div class="loading-indicator" v-if="msg.isProcessing && msg.content === ''">
+              <div class="loading-indicator" v-if="msg.isProcessing && msg.content === '' && !processMessageContent(msg.content).thinkContent">
                 <span class="dot"></span>
                 <span class="dot"></span>
                 <span class="dot"></span>
               </div>
 
-              <!--
-                消息文本内容:
-                使用 v-if 确保只在 content 确实有值时渲染 Markdown。
-              -->
-              <div class="content" v-if="msg.content" v-html="renderMarkdown(msg.content)"></div>
+              <!-- "Think" Content Area -->
+              <div v-if="processMessageContent(msg.content).thinkContent" class="think-container">
+                <div class="think-header" @click="toggleThinkVisibility(msg.id)">
+                  <span>Thinking Process...</span>
+                  <span class="think-toggle-icon">{{ messageThinkStates[msg.id] ? '▶' : '▼' }}</span>
+                </div>
+                <div v-if="!messageThinkStates[msg.id]" class="think-content" v-html="renderMarkdown(processMessageContent(msg.content).thinkContent || '')"></div>
+              </div>
+
+              <!-- Main Message Content -->
+              <div class="content" v-if="processMessageContent(msg.content).mainContent" v-html="renderMarkdown(processMessageContent(msg.content).mainContent)"></div>
 
               <!-- 消息文件列表 (如果有) -->
               <div v-if="msg.message_files && msg.message_files.length > 0" class="message-files">
@@ -55,7 +61,8 @@
 
               <!--
                  复制按钮:
-                 仅当有内容时显示。
+                 仅当有内容 (mainContent or thinkContent) 时显示。
+                 We'll copy the original full msg.content for now, or decide later if we need separate copy buttons.
                -->
               <div v-if="msg.content" class="copy-action">
                 <el-tooltip content="复制" placement="top" :enterable="false">
@@ -120,10 +127,62 @@
     return md.render(text);
   };
 
+  // --- Message Content Processing ---
+  // Ensure this function is robust for streaming
+  const processMessageContent = (content: string): { thinkContent: string | null, mainContent: string } => {
+    const thinkStartTag = "<think>";
+    const thinkEndTag = "</think>";
+    let thinkContent: string | null = null;
+    let mainContent = "";
+
+    if (!content) {
+      return { thinkContent: null, mainContent: '' };
+    }
+
+    const startIdx = content.indexOf(thinkStartTag);
+    const endIdx = content.indexOf(thinkEndTag);
+
+    if (startIdx !== -1) {
+      // Part before <think> is always mainContent
+      mainContent = content.substring(0, startIdx);
+
+      if (endIdx !== -1 && endIdx > startIdx) {
+        // Both tags are present and in correct order
+        thinkContent = content.substring(startIdx + thinkStartTag.length, endIdx);
+        // Part after </think> is also mainContent
+        mainContent += content.substring(endIdx + thinkEndTag.length);
+      } else {
+        // <think> is present, but </think> is not yet, or in wrong order.
+        // All content from <think> tag onwards is considered potential think content for now.
+        thinkContent = content.substring(startIdx + thinkStartTag.length);
+        // mainContent is already set to content before <think>
+      }
+    } else {
+      // No <think> tag found
+      mainContent = content;
+    }
+    // Trim mainContent only if it's not empty, to avoid issues if it's intentionally spaces perhaps (though unlikely for display)
+    // However, the previous version did .trim() on concatenated parts, so for consistency:
+    mainContent = mainContent.trim();
+    return { thinkContent, mainContent };
+  };
+
   // --- 组件 Props ---
   const props = defineProps<{
     messages: Message[]; // 由父组件维护和更新的消息数组
   }>();
+
+  // --- Think Content Visibility State ---
+  const messageThinkStates = ref<Record<string, boolean>>({}); // true: collapsed, false: expanded
+
+  const toggleThinkVisibility = (messageId: string) => {
+    if (messageThinkStates.value[messageId] !== undefined) {
+      messageThinkStates.value[messageId] = !messageThinkStates.value[messageId];
+    } else {
+      // Should be initialized by the watcher, but as a fallback, expand if somehow not set.
+      messageThinkStates.value[messageId] = false;
+    }
+  };
 
   // --- DOM 引用 ---
   const messagesContainer = ref<HTMLDivElement | null>(null);
@@ -152,6 +211,13 @@
 
   // 监听消息数组的变化 (包括内部属性如 content, isProcessing)
   watch(() => props.messages, (newMessages, oldMessages) => {
+    // Initialize think states for new messages
+    newMessages.forEach(msg => {
+      if (msg.role === 'assistant' && processMessageContent(msg.content).thinkContent && messageThinkStates.value[msg.id] === undefined) {
+        messageThinkStates.value[msg.id] = true; // Default to collapsed
+      }
+    });
+
     // 判断是新增消息还是内容更新
     const isNewMessageAdded = newMessages.length > oldMessages.length;
     // 查找最后一条消息是否正在流式更新 (它的 content 变化了但 isProcessing 还是 true)
@@ -496,6 +562,52 @@
   .copy-btn:hover {
     color: #1f2937;
     background-color: #f3f4f6;
+  }
+
+  /* --- Think Container Styles --- */
+  .think-container {
+    margin-bottom: 8px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+  }
+
+  .think-header {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none; /* Prevent text selection on click */
+    color: #333; /* Darker text for header */
+  }
+
+  .think-header:hover {
+    background-color: #f0f0f0; /* Slight hover effect */
+  }
+
+  .think-toggle-icon {
+    font-size: 0.8em; /* Smaller icon */
+    margin-left: 8px;
+  }
+
+  .think-content {
+    padding: 0 12px 12px 12px; /* Top padding is handled by header's bottom padding if any, or adjust */
+    height: 150px;
+    overflow-y: auto;
+    background-color: #ffffff; /* White background for content area */
+    border-top: 1px solid #e0e0e0; /* Separator line */
+    font-size: 0.9em;
+    color: #333; /* Standard text color */
+  }
+
+  /* Styles for Markdown content within think-content, if needed for specificity */
+  .think-content :deep(p) {
+    margin-bottom: 0.5em;
+  }
+  .think-content :deep(pre) {
+    font-size: 0.85em; /* Slightly smaller code blocks in think */
   }
 
 </style>
